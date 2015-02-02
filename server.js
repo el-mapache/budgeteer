@@ -1,6 +1,7 @@
 var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
+var methodOverride = require('method-override');
 var bodyParser = require('body-parser');
 var logger = require('morgan');
 var multer = require('multer');
@@ -17,6 +18,7 @@ app.set('view engine','html');
 app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
+app.use(methodOverride());
 app.use(cookieParser());
 
 app.use('/', routes);
@@ -43,7 +45,7 @@ app.set('port', process.env.PORT || 9090);
 
 models.sequelize.sync().complete(function(syncError) {
   if (syncError) {
-    return console.log(syncError.message);  
+    return console.log(syncError.message);
   }
 
   var server = app.listen(app.get('port'), function() {

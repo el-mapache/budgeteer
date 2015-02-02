@@ -1,23 +1,21 @@
 var gulp = require('gulp');
 
-function pgConnect(fn) {
-  var fs = require('fs');
-  var dbConfigs = JSON.parse(fs.readFileSync('./config/config.json', 'utf8'));
-  var pg = require('pg');
-  var env = process.env.ENVIRONMENT || 'development';
+var concat = require('gulp-concat');
+var browserify = require('gulp-browserify');
+var reactify = require('reactify');
 
-  var dbEnv = dbConfigs[env];
-  var connection = 'postgres://' + dbEnv.username + ':' + dbEnv.password + '@' + dbEnv.host + '/postgres';
+gulp.task('js', function () {
+  return gulp.src(['src/components/app.jsx'])
+    .pipe(concat('bundle.js'))
+    .pipe(browserify({
+      transform: [es6Reactify]
+    })).on('prebundle', function(bundler) {
+      bundler.require('react');
+    })
+    .pipe(gulp.dest('./build/js'));
+});
 
-  pg.connect(connection, function(err, client, done) {
-    if (err) {
-      console.log('Error connecting to postgres! ' + err.message);
-      return;
-    }
 
-    fn(dbEnv, client, done);
-  });
-}
 
 gulp.task('db:create', function() {
   pgConnect(function(dbEnv, client, done) {
@@ -41,3 +39,28 @@ gulp.task('db:drop', function() {
     });
   });
 });
+
+
+// Utilz
+function pgConnect(fn) {
+  var fs = require('fs');
+  var dbConfigs = JSON.parse(fs.readFileSync('./config/config.json', 'utf8'));
+  var pg = require('pg');
+  var env = process.env.ENVIRONMENT || 'development';
+
+  var dbEnv = dbConfigs[env];
+  var connection = 'postgres://' + dbEnv.username + ':' + dbEnv.password + '@' + dbEnv.host + '/postgres';
+
+  pg.connect(connection, function(err, client, done) {
+    if (err) {
+      console.log('Error connecting to postgres! ' + err.message);
+      return;
+    }
+
+    fn(dbEnv, client, done);
+  });
+}
+
+function es6Reactify(file) {
+  return reactify(file, {es6: true});
+}

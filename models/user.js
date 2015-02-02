@@ -1,5 +1,6 @@
 module.exports = function(sequelize, DataTypes) {
   var User = sequelize.define('User', {
+    username:  DataTypes.CHAR,
     firstName: DataTypes.CHAR,
     lastName:  DataTypes.CHAR,
     email:     DataTypes.CHAR,
@@ -15,4 +16,3 @@ module.exports = function(sequelize, DataTypes) {
 
   return User;
 };
-
