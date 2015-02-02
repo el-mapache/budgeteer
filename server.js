@@ -4,6 +4,7 @@ var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var logger = require('morgan');
 var multer = require('multer');
+var models = require('./models');
 
 var routes = require('./routes/index');
 
@@ -39,7 +40,14 @@ app.use(function(err, req, res, next) {
 });
 
 app.set('port', process.env.PORT || 9090);
-var server = app.listen(app.get('port'), function() {
-  logger('Express server listening on port ' + server.address().port);
+
+models.sequelize.sync().complete(function(syncError) {
+  if (syncError) {
+    return console.log(syncError.message);  
+  }
+
+  var server = app.listen(app.get('port'), function() {
+    logger('Express server listening on port ' + server.address().port);
+  });
 });
 
