@@ -5,11 +5,13 @@ var methodOverride = require('method-override');
 var bodyParser = require('body-parser');
 var logger = require('morgan');
 var multer = require('multer');
-var models = require('./models');
+
 
 var routes = require('./routes/index');
 
 var app = express();
+
+app.set('port', process.env.PORT || 9090);
 
 app.set('views', path.join(__dirname, 'views'));
 app.engine('html', require('consolidate').handlebars);
@@ -21,9 +23,10 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(methodOverride());
 app.use(cookieParser());
 
+app.use('/build', express.static(__dirname + '/build'));
 app.use('/', routes);
 
-// not sure how this only catches 404s? Need to investigate.
+// All routes will sue this middleware to redirect in event of an error
 app.use(function(req, res, next) {
   var err = new Error('Not Found!');
   err.status = 404;
@@ -41,15 +44,6 @@ app.use(function(err, req, res, next) {
   });
 });
 
-app.set('port', process.env.PORT || 9090);
-
-models.sequelize.sync().complete(function(syncError) {
-  if (syncError) {
-    return console.log(syncError.message);
-  }
-
-  var server = app.listen(app.get('port'), function() {
-    logger('Express server listening on port ' + server.address().port);
-  });
+var server = app.listen(app.get('port'), function() {
+  logger('Express server listening on port ' + server.address().port);
 });
-

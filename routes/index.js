@@ -1,9 +1,16 @@
+require('node-jsx').install({ extension: '.jsx', harmony: true })
+
 var express = require('express');
 var router = express.Router();
 var budgets = require('./budgets.js');
+var React = require('react');
+var appEl = require('../src/components/app.jsx');
 
 router.get('/', function(req, res) {
-  res.render('index');
+  res.render('index', {
+  	markup: React.renderToString(React.createElement(appEl))
+  });
+//res.render('index');
 });
 
 router.get('/budgets', budgets.index);

@@ -1,8 +1,9 @@
 var gulp = require('gulp');
-
 var concat = require('gulp-concat');
 var browserify = require('gulp-browserify');
 var reactify = require('reactify');
+
+
 
 gulp.task('js', function () {
   return gulp.src(['src/components/app.jsx'])
@@ -14,8 +15,6 @@ gulp.task('js', function () {
     })
     .pipe(gulp.dest('./build/js'));
 });
-
-
 
 gulp.task('db:create', function() {
   pgConnect(function(dbEnv, client, done) {
@@ -30,7 +29,6 @@ gulp.task('db:create', function() {
   });
 });
 
-
 gulp.task('db:drop', function() {
   pgConnect(function(dbEnv, client, done) {
     client.query('DROP DATABASE IF EXISTS ' + dbEnv.database, function(err) {
@@ -40,12 +38,23 @@ gulp.task('db:drop', function() {
   });
 });
 
+gulp.task('db:sync', function() {
+  var models = require('./models');
+  models.sequelize.sync().complete(function(syncError) {
+    if (syncError) {
+      return console.log(syncError.message);
+    }
+
+    console.log('Models synced successfully.');
+  });
+});
 
 // Utilz
 function pgConnect(fn) {
   var fs = require('fs');
-  var dbConfigs = JSON.parse(fs.readFileSync('./config/config.json', 'utf8'));
   var pg = require('pg');
+
+  var dbConfigs = JSON.parse(fs.readFileSync('./config/config.json', 'utf8'));
   var env = process.env.ENVIRONMENT || 'development';
 
   var dbEnv = dbConfigs[env];
