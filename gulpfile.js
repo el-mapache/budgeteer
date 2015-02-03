@@ -8,12 +8,12 @@ var browserify = require('gulp-browserify');
 var reactify = require('reactify');
 
 var PATHS = {
-  JS: './js/**/*.js',
+  JS: ['./src/**/*.js', './src/**/*.jsx'],
   SASS: ['./assets/stylesheets/**/*.sass', './assets/stylesheets/**/*.scss']
 };
 
 gulp.task('js', function () {
-  return gulp.src(['src/components/app.jsx'])
+  return gulp.src('./src/index.js')
     .pipe(concat('bundle.js'))
     .pipe(browserify({
       transform: [es6Reactify]
@@ -34,7 +34,7 @@ gulp.task('css', function() {
 
 gulp.task('watch', function() {
   gulp.watch(PATHS.SASS, ['css']);
-  gulp.watch(['./src/components/**/*.js', './src/components/**/*.jsx'], ['js']);
+  gulp.watch(PATHS.JS, ['js']);
 });
 
 gulp.task('default', ['watch']);
