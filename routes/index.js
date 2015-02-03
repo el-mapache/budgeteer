@@ -10,7 +10,6 @@ router.get('/', function(req, res) {
   res.render('index', {
   	markup: React.renderToString(React.createElement(appEl))
   });
-//res.render('index');
 });
 
 router.get('/budgets', budgets.index);

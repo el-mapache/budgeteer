@@ -1,9 +1,16 @@
 var gulp = require('gulp');
 var concat = require('gulp-concat');
+var sass = require('gulp-sass');
+var rename = require('gulp-rename');
+var flatten = require('gulp-flatten');
+var copy = require('gulp-copy');
 var browserify = require('gulp-browserify');
 var reactify = require('reactify');
 
-
+var PATHS = {
+  JS: './js/**/*.js',
+  SASS: ['./assets/stylesheets/**/*.sass', './assets/stylesheets/**/*.scss']
+};
 
 gulp.task('js', function () {
   return gulp.src(['src/components/app.jsx'])
@@ -15,6 +22,22 @@ gulp.task('js', function () {
     })
     .pipe(gulp.dest('./build/js'));
 });
+
+gulp.task('css', function() {
+  return gulp.src(PATHS.SASS)
+    .pipe(sass())
+    .pipe(flatten())
+    //.pipe(rename({suffix: '.min'}))
+    //.pipe(minifycss())
+    .pipe(gulp.dest('./build/css'));
+});
+
+gulp.task('watch', function() {
+  gulp.watch(PATHS.SASS, ['css']);
+  gulp.watch(['./src/components/**/*.js', './src/components/**/*.jsx'], ['js']);
+});
+
+gulp.task('default', ['watch']);
 
 gulp.task('db:create', function() {
   pgConnect(function(dbEnv, client, done) {

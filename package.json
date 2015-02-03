@@ -2,9 +2,9 @@
   "name": "budgeteer",
   "version": "0.0.1",
   "description": "make a budget and stick to it.",
-  "main": "app.js",
+  "main": "server.js",
   "scripts": {
-    "start": "node server.js"
+    "start": "supervisor -e jsx server.js"
   },
   "author": "el-mapache",
   "license": "ISC",
@@ -30,18 +30,20 @@
     "underscore": "^1.7.0"
   },
   "devDependencies": {
+    "del": "^1.1.1",
     "gulp": "^3.8.10",
     "gulp-browserify": "^0.5.1",
     "gulp-concat": "^2.4.3",
+    "gulp-copy": "0.0.2",
+    "gulp-flatten": "0.0.4",
     "gulp-livereload": "^3.6.0",
     "gulp-minify": "0.0.5",
     "gulp-react": "^2.0.0",
     "gulp-rename": "^1.2.0",
     "gulp-sass": "^1.3.2",
     "gulp-uglify": "^1.1.0",
-    "del": "^1.1.1",
+    "reactify": "^1.0.0",
     "vinyl-source-stream": "^1.0.0",
-    "watchify": "^2.3.0",
-    "reactify": "^1.0.0"
+    "watchify": "^2.3.0"
   }
 }

@@ -6,8 +6,7 @@ var bodyParser = require('body-parser');
 var logger = require('morgan');
 var multer = require('multer');
 
-
-var routes = require('./routes/index');
+var routes = require('./routes');
 
 var app = express();
 
@@ -34,7 +33,9 @@ app.use(function(req, res, next) {
 });
 
 // DEV ONLY
-app.use(express.static(path.join(__dirname, 'public')));
+if (process.env === 'development') {
+  app.use(express.static(path.join(__dirname, 'public')));
+}
 
 app.use(function(err, req, res, next) {
   res.status(err.status || 500);
