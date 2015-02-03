@@ -8,7 +8,7 @@ var browserify = require('gulp-browserify');
 var reactify = require('reactify');
 
 var PATHS = {
-  JS: ['./src/**/*.js', './src/**/*.jsx'],
+  JS: ['./src/**/*.js', './src/**/*.jsx', '!./src/**/*-test.js'],
   SASS: ['./assets/stylesheets/**/*.sass', './assets/stylesheets/**/*.scss']
 };
 
@@ -33,8 +33,12 @@ gulp.task('css', function() {
 });
 
 gulp.task('watch', function() {
-  gulp.watch(PATHS.SASS, ['css']);
-  gulp.watch(PATHS.JS, ['js']);
+  gulp.watch(PATHS.SASS, ['css']).on('error', function(e) {
+    console.log(e);
+  });
+  gulp.watch(PATHS.JS, ['js']).on('error', function(e) {
+    console.log(e);
+  });
 });
 
 gulp.task('default', ['watch']);
