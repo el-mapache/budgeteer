@@ -6,6 +6,7 @@ describe('ActionCreator', function() {
   var AppDispatcher;
   var MockActions = class MockActions extends ActionCreator {
     constructor() {
+      super();
       this.generateActions('action1', 'action2');
     }
   };
@@ -16,6 +17,12 @@ describe('ActionCreator', function() {
   });
 
   describe('creating a new action class', function() {
+    it('should set a name property automagically', function() {
+      var actions = new MockActions();
+      expect(actions.name).toBeDefined();
+      expect(actions.name).toBe('MockActions');
+    });
+
     it('creates methods for each of the supplied actions', function() {
       var actions = new MockActions();
 

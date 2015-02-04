@@ -18,7 +18,12 @@ class Store extends EventEmitter {
 
       var callback = `on${action.charAt(0).toUpperCase()}${action.slice(1)}`;
 
-      if (this.name === target && this[callback] && this[callback] instanceof 'function') {
+      // This store doesnt implement the triggered Actions.
+      if (this.name !== target) {
+        return;
+      }
+
+      if (this[callback] && this[callback] instanceof 'function') {
         var result = this[callback](payload.data);
 
         result && this.emitChange();
@@ -40,4 +45,3 @@ class Store extends EventEmitter {
 }
 
 module.export = Store;
-
