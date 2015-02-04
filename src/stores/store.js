@@ -1,5 +1,5 @@
 var EventEmitter = require('events').EventEmitter;
-var AppDispatcher = require('../actions/app-dispatcher.js');
+var AppDispatcher = require('../dispatcher/app-dispatcher.js');
 
 const CHANGE_EVENT = 'change';
 
@@ -13,22 +13,42 @@ const CHANGE_EVENT = 'change';
 **/
 class Store extends EventEmitter {
   constructor() {
-    this.dispatchToken = dispatcher.register((payload) =>
-      var { target, action } = payload.action.split('_');
+    this.CALLBACKS = [];
 
-      var callback = `on${action.charAt(0).toUpperCase()}${action.slice(1)}`;
+    this.dispatchToken = dispatcher.register((payload) => {
+      // var {a: a, b: b} = {a:1, b:2}
+      let [ target, action ] = payload.action.split('_');
+
+      var callback = deriveCallbackName(action);
 
       // This store doesnt implement the triggered Actions.
-      if (this.name !== target) {
+      if (!target in this.CALLBACKS) {
         return;
       }
 
-      if (this[callback] && this[callback] instanceof 'function') {
+      if (this.CALLBACKS[target][action] instanceof 'function') {
         var result = this[callback](payload.data);
 
         result && this.emitChange();
       }
-    );
+    });
+  }
+
+  bindToActions(...actionClasses) {
+    actionClasses.forEach((actionClass) => {
+      this.CALLBACKS[actionClass.name] = {};
+
+      actionClass.ACTIONS.forEach((action) => {
+        var derivedCallback = _deriveCallbackName(action);
+
+        if (derivedCallback) {
+          derivedCallback = derivedCallback.bind(this);
+        }
+
+        this.CALLBACKS[actionClass.name][action] = this[derivedCallback];
+
+      });
+    });
   }
 
   emitChange() {
@@ -42,6 +62,10 @@ class Store extends EventEmitter {
   stopListeningTo(callback) {
     this.removeListener(CHANGE_EVENT, callback);
   }
+}
+
+function _deriveCallbackName(action) {
+  return `on${action.charAt(0).toUpperCase()}${action.slice(1)}`;
 }
 
 module.export = Store;

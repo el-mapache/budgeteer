@@ -7,6 +7,8 @@ class ActionCreator {
   }
 
   generateActions(...actions) {
+    this.ACTIONS = [actions];
+
     actions.forEach((action) => {
       _generateAction(this, action);
     });

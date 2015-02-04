@@ -10,6 +10,7 @@
   "author": "el-mapache",
   "license": "ISC",
   "dependencies": {
+    "6to5-jest": "*",
     "body-parser": "^1.11.0",
     "consolidate": "^0.10.0",
     "cookie-parser": "^1.3.3",
@@ -33,6 +34,8 @@
     "underscore": "^1.7.0"
   },
   "devDependencies": {
+    "6to5": "^3.3.9",
+    "6to5ify": "^4.1.0",
     "del": "^1.1.1",
     "gulp": "^3.8.10",
     "gulp-browserify": "^0.5.1",
@@ -52,6 +55,8 @@
   },
   "jest": {
     "scriptPreprocessor": "preprocessor.js",
-    "unmockedModulePathPatterns": ["object-assign"]
+    "unmockedModulePathPatterns": [
+      "object-assign"
+    ]
   }
 }

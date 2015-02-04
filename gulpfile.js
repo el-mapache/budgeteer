@@ -6,6 +6,7 @@ var flatten = require('gulp-flatten');
 var copy = require('gulp-copy');
 var browserify = require('gulp-browserify');
 var reactify = require('reactify');
+var to5ify = require('6to5ify');
 
 var PATHS = {
   JS: ['./src/**/*.js', './src/**/*.jsx', '!./src/**/*-test.js'],
@@ -16,7 +17,7 @@ gulp.task('js', function () {
   return gulp.src('./src/index.js')
     .pipe(concat('bundle.js'))
     .pipe(browserify({
-      transform: [es6Reactify]
+      transform: [reactify, to5ify]
     })).on('prebundle', function(bundler) {
       bundler.require('react');
     })
