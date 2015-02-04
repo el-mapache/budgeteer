@@ -1,6 +1,5 @@
 var Dispatcher = require('../dispatcher/app-dispatcher.js');
 
-
 class ActionCreator {
   constructor() {
     // Derive the name of the ActionCreator from it's constructor.

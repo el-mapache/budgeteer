@@ -21,6 +21,7 @@
     "morgan": "^1.5.1",
     "multer": "^0.1.7",
     "node-jsx": "^0.12.4",
+    "object-assign": "^2.0.0",
     "pg": "^4.2.0",
     "pg-hstore": "^2.3.1",
     "postgresql": "0.0.1",
@@ -50,6 +51,7 @@
     "watchify": "^2.3.0"
   },
   "jest": {
-    "scriptPreprocessor": "preprocessor.js"
+    "scriptPreprocessor": "preprocessor.js",
+    "unmockedModulePathPatterns": ["object-assign"]
   }
 }
