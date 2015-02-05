@@ -7,4 +7,4 @@ class BudgetActions extends ActionCreator {
   }
 }
 
-module.exports = BudgetActions;
+module.exports = new BudgetActions();

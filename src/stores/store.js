@@ -36,7 +36,7 @@ class Store extends EventEmitter {
     });
   }
 
-  // Create a dictionary with mappings from an action (i.e. 'create'), 
+  // Create a dictionary with mappings from an action (i.e. 'create'),
   // to methods names on this class (i.e. 'onCreate').
   bindToActions(actionClass) {
     this.CALLBACKS[actionClass.name] = {};
