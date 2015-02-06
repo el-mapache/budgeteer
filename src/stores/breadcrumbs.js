@@ -1,17 +1,8 @@
-var _parts = [];
+var Store = require('./store.js');
 
-class BreadcrumbStore {
-  constructor() {
-    //dispatcher.register - > update parts
-  }
 
-  getParts() {
-    return _parts;
-  }
-
-  setParts(parts) {
-    _parts = parts;
-  }
+class BreadcrumbStore extends Store {
+  constructor() {}
 }
 
-module.exports = BreadcrumbStore;
+module.exports = new BreadcrumbStore();

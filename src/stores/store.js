@@ -2,7 +2,6 @@ var EventEmitter = require('events').EventEmitter;
 var AppDispatcher = require('../dispatcher/app-dispatcher.js');
 
 const CHANGE_EVENT = 'change';
-var _STATE = null;
 
 /**
   * Default store implementation that other stores can inherit from.
@@ -36,11 +35,24 @@ class Store extends EventEmitter {
     });
   }
 
+  setInitialState() {
+    // This method should be overridden with custom behaviour.
+  }
+
   // Create a dictionary with mappings from an action (i.e. 'create'),
   // to methods names on this class (i.e. 'onCreate').
   bindToActions(actionClass) {
     this.CALLBACKS[actionClass.name] = {};
 
+    /**
+      * Loop through the actions defined in the ActionCreator class
+      * and set handler method when those actions are dispatched.
+      * Handler will be added automatically as long as it follows the
+      * naming convention 'on${Action}'. Therefore, a mapping to an
+      * action called 'create' should therefore be named 'onCreate'.
+    **/
+
+    // TODO: think about how to allow stores to bind to more than one ActionCreator.
     actionClass.ACTIONS.forEach((action) => {
       var derivedHandler = _deriveHandler(action);
 
@@ -55,8 +67,30 @@ class Store extends EventEmitter {
     this.emit(CHANGE_EVENT);
   }
 
-  listenTo(callback, ctx) {
+  /**
+    * Bind a callback to the store that is passed a copy of the store's new state
+    * after it has changed.
+    * All subscribing listeners recieve a copy of the state of the store when they are
+    * registered.
+    *
+    * @param {callback} function executed on state change
+    * @param {ctx} the object context the callback will be executed in.
+    * @param {onAfterBind} optional callback to receive a copy of store's initial state.
+  **/
+
+  listenTo(callback, ctx, onAfterBind) {
+    if ((!callback || typeof callback !== 'function') || !ctx) {
+      throw new Error('listenTo must be passed a callback function and object context.');
+    }
+
     this.on(CHANGE_EVENT, callback.bind(ctx, this.getState()));
+
+    if (!this.isInitialized()) {
+      this.setInitialized();
+      this.setInitialState();
+    }
+
+    typeof onAfterBind === 'function' && onAfterBind(this.getState());
   }
 
   stopListeningTo(callback) {
@@ -70,9 +104,20 @@ class Store extends EventEmitter {
   setState(newState) {
     _STATE = newState;
   }
+
+  isInitialized() {
+    return _hasBeenInitialized;
+  }
+
+  setInitialized() {
+    _hasBeenInitialized = true;
+  }
 }
 
 /** @private **/
+
+var _STATE = {};
+var _hasBeenInitialized = false;
 
 // Take a raw action, uppercase it, and stick an 'on' in front of it.
 // For example, 'destroy' becomes 'onDestroy'.

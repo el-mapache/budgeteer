@@ -1,4 +1,5 @@
-// var b = require('./actions/budget-actions.js');
-// require('./components/app.jsx');
-
-// console.log(new b());
+require('./dispatcher/app-dispatcher.js');
+require('./stores');
+require('./actions');
+require('./mixins/store-consumer.js');
+require('./components/app.js');

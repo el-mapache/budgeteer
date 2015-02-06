@@ -1,9 +1,9 @@
 var React = require('react');
 
 var BudgetList = React.createClass({
-  render() {
+  render: function() {
     return (
-      <div></div>
+      <ul></ul>
     )
   }
 });

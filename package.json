@@ -4,7 +4,7 @@
   "description": "make a budget and stick to it.",
   "main": "server.js",
   "scripts": {
-    "start": "supervisor -e js,jsx server.js",
+    "start": "nodemon server.js",
     "test": "jest"
   },
   "author": "el-mapache",
@@ -21,7 +21,6 @@
     "method-override": "^2.3.1",
     "morgan": "^1.5.1",
     "multer": "^0.1.7",
-    "node-jsx": "^0.12.4",
     "object-assign": "^2.0.0",
     "pg": "^4.2.0",
     "pg-hstore": "^2.3.1",
@@ -42,7 +41,6 @@
     "gulp-concat": "^2.4.3",
     "gulp-copy": "0.0.2",
     "gulp-flatten": "0.0.4",
-    "gulp-livereload": "^3.6.0",
     "gulp-minify": "0.0.5",
     "gulp-react": "^2.0.0",
     "gulp-rename": "^1.2.0",

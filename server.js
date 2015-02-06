@@ -6,7 +6,7 @@ var bodyParser = require('body-parser');
 var logger = require('morgan');
 var multer = require('multer');
 
-var routes = require('./routes');
+var routes = require('./routes/index.js');
 
 var app = express();
 

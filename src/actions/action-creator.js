@@ -1,4 +1,4 @@
-var Dispatcher = require('../dispatcher/app-dispatcher.js');
+var AppDispatcher = require('../dispatcher/app-dispatcher.js');
 
 /**
   * Generic action creator class.
@@ -47,7 +47,7 @@ function _generateAction(actionClass, action) {
       data: data
     };
 
-    Dispatcher.dispatch(payload);
+    AppDispatcher.dispatch(payload);
   }
 }
 
