@@ -5,6 +5,9 @@ var rename = require('gulp-rename');
 var flatten = require('gulp-flatten');
 var copy = require('gulp-copy');
 var browserify = require('gulp-browserify');
+var browserReg = require('browserify');
+var source = require('vinyl-source-stream');
+var watchify = require('watchify');
 var reactify = require('reactify');
 var to5ify = require('6to5ify');
 
@@ -28,21 +31,23 @@ gulp.task('css', function() {
   return gulp.src(PATHS.SASS)
     .pipe(sass())
     .pipe(flatten())
+    .pipe(concat('styles.css'))
     //.pipe(rename({suffix: '.min'}))
     //.pipe(minifycss())
     .pipe(gulp.dest('./build/css'));
 });
 
-gulp.task('watch', function() {
+gulp.task('watchCSS', function() {
   gulp.watch(PATHS.SASS, ['css']).on('error', function(e) {
-    console.log(e);
-  });
-  gulp.watch(PATHS.JS, ['js']).on('error', function(e) {
     console.log(e);
   });
 });
 
-gulp.task('default', ['watch']);
+gulp.task('watchJS', function() {
+  return watchifyScript();
+});
+
+gulp.task('default', ['watchJS', 'watchCSS']);
 
 gulp.task('db:create', function() {
   pgConnect(function(dbEnv, client, done) {
@@ -78,6 +83,32 @@ gulp.task('db:sync', function() {
 });
 
 // Utilz
+function watchifyScript() {
+  var bundler = browserReg({
+    entries: ['./src/index.js'],
+    transform: [reactify, to5ify],
+    debug: false,
+    cache: {}, // required for watchify
+    packageCache: {}, // required for watchify
+    fullPaths: true // required to be true only for watchify
+  });
+
+  var rebundle = function() {
+    watcher.bundle()
+           .pipe(source('bundle.js'))
+           .pipe(gulp.dest('./build/js'));
+    console.log('js compiled');
+  }
+
+  var watcher = watchify(bundler);
+
+  // for some reason this is necessary to get watchify to work.
+  rebundle();
+
+  watcher.on('update', rebundle);
+  return rebundle;
+}
+
 function pgConnect(fn) {
   var fs = require('fs');
   var pg = require('pg');
@@ -96,8 +127,4 @@ function pgConnect(fn) {
 
     fn(dbEnv, client, done);
   });
-}
-
-function es6Reactify(file) {
-  return reactify(file, {es6: true});
 }

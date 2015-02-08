@@ -1,22 +1,29 @@
 var React = require('react');
-var BudgetActions = require('../../actions/budget-actions.js');
+var Button = require('../generic/button.js');
+var TextInput = require('../generic/text-input.js');
+var BudgetDatePicker = require('./budget-date-picker.js');
 
 var NewBudget = React.createClass({
-  componentWillMount: function() {},
-
-  newBudgetHandler: function() {
-    BudgetActions.new();
-  },
-
   render: function() {
     return (
-      <button type="button" onClick={this.newBudgetHandler} className="btn light-blue darken-3">
-        <i className="medium mdi-content-add-circle-outline left"></i>
-        Start a budget
-      </button>
-
-      // <h1>new budget please</h1>
+      <form onSubmit={this.handleSubmit} className="row">
+        <div className="col s6">
+          <div className="row">
+            <TextInput labelText="Budget Title" name="budget-title" defaultValue="" ref="title" />
+            <TextInput labelText="How much do you want to spend?" name="budget-total" defaultValue="" ref="total"/>
+            <BudgetDatePicker labelText="Budget Start" ref="startDate" className="col s6" />
+            <BudgetDatePicker labelText="Budget End" ref="endDate" className="col s6" />
+          </div>
+          <Button buttonType="submit" text="Create Budget"/>
+        </div>
+      </form>
     );
+  },
+
+  handleSubmit: function(event) {
+    event.preventDefault();
+    console.log('Im submitting!', arguments)
+    //do ajax stuff
   }
 });
 

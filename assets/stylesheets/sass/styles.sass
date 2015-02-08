@@ -1,0 +1,82 @@
+/** DATEPICKER **/
+table.daypicker {
+  width: 40%;
+  font-size: 0.85rem;
+  border-radius: 0px;
+
+  td {
+    padding: 3px 0px;
+    text-align: center;
+  }
+
+  th {
+    padding: 0px 5px;
+  }
+
+  /* Caption & navigation buttons */
+
+  .daypicker__caption {
+    line-height: 20px;
+  }
+
+  .daypicker__weekday {
+    width: 36px;
+    line-height: 30px;
+    font-size: 0.875em;
+    color: #82888a;
+    font-weight: normal;
+  }
+
+  .daypicker__nav {
+    display: block;
+    border: 0;
+    background-color: transparent;
+    position: relative;
+    height: 20px;
+    width: 30px;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 25%;
+    cursor: pointer;
+  }
+
+  .daypicker__nav--right {
+    background-image: url("../font/right.svg");
+  }
+  .daypicker__nav--left {
+    background-image: url("../font/left.svg");
+  }
+
+  .daypicker__day {
+    width: 36px;
+    line-height: 20px;
+    cursor: pointer;
+
+    &:hover:not(.daypicker__day--outside):not(.daypicker__day--disabled) {
+      background-color: #FF0000;
+      color: white;
+    }
+  }
+
+  /* Modifiers */
+  .daypicker__day--outside {
+    color: #dce0e0 !important;
+  }
+
+  // custom modifiers
+
+  .daypicker__day--disabled {
+    cursor: default;
+    color: #dce0e0;
+    background-color: #F1F1F1;
+  }
+
+  .daypicker__day--today {
+    color: #FF0000;
+  }
+
+  .daypicker__day--selected:not(.daypicker__day--outside) {
+    color: white;
+    background-color: #FF0000;
+  }
+}

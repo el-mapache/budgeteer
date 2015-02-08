@@ -1,8 +1,10 @@
-var React =         require('react');
-var NewBudget =     require('./new-budget.js');
-var BudgetList =    require('./budget-list.js');
-var BudgetStore =   require('../../stores/budget-store.js');
-var StoreConsumer = require('../../mixins/store-consumer.js');
+var React =           require('react');
+var AddBudgetButton = require('./add-budget-button.js');
+var NewBudget =       require('./new-budget.js');
+var BudgetList =      require('./budget-list.js');
+var BudgetStore =     require('../../stores/budget-store.js');
+var StoreConsumer =   require('../../mixins/store-consumer.js');
+
 
 var BudgetPane = React.createClass({
   mixins: [StoreConsumer.fromStore(BudgetStore)],
@@ -16,6 +18,7 @@ var BudgetPane = React.createClass({
     return (
       <div className="row pane">
         <section>
+          <AddBudgetButton />
           <NewBudget />
         </section>
         <BudgetList />
