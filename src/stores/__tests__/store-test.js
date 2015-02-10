@@ -3,25 +3,34 @@ jest.dontMock('../../actions/action-creator.js');
 jest.dontMock('../../actions/budget-actions.js');
 
 describe('Store', function() {
-  let BudgetActions = require('../../actions/budget-actions.js');
+  let actions = require('../../actions/budget-actions.js');
   let Store = require('../store.js');
   let AppDispatcher = require('../../dispatcher/app-dispatcher.js');
-  let actions = new BudgetActions();
 
   class SweetStore extends Store {
     constructor() {
       super();
       this.bindToActions(actions);
-      this.setState('bummed');
+    }
+
+    setInitialState() {
+      return {
+        stokeLevel: 'bummed'
+      }
     }
 
     onCreate(data) {
-      this.setState(data.stokeLevel);
+      this.setState(data);
     }
   }
 
   AppDispatcher.register.mockReturnValue('ID_1');
-  var store = new SweetStore();
+  var store;
+
+  beforeEach(function() {
+    store = new SweetStore();
+  })
+
   var callback = AppDispatcher.register.mock.calls[0][0];
 
   describe('instantiation', function() {
@@ -33,6 +42,11 @@ describe('Store', function() {
       expect(store.CALLBACKS).toBeDefined();
       expect(store.CALLBACKS instanceof Object).toBeTruthy();
     });
+
+    it('is uninitialized on instantiation', function() {
+      expect(store.isInitialized()).toBeFalsy();
+      expect(Object.keys(store.getState()).length).toBe(0);
+    })
   });
 
   describe('binding actions', function() {
@@ -50,7 +64,12 @@ describe('Store', function() {
       };
 
       callback(mockAction);
-      expect(store.getState()).toBe('pitted');
+      expect(store.getState().stokeLevel).toBe('pitted');
+    });
+
+    it('initialises itself when first bound', function() {
+      let store = new SweetStore();
+      expect(store.getState()).toBe({});
     });
   });
 });

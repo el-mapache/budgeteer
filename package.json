@@ -23,6 +23,8 @@
     "morgan": "^1.5.1",
     "multer": "^0.1.7",
     "object-assign": "^2.0.0",
+    "passport": "^0.2.1",
+    "passport-google-oauth": "^0.1.5",
     "pg": "^4.2.0",
     "pg-hstore": "^2.3.1",
     "postgresql": "0.0.1",
@@ -32,7 +34,9 @@
     "react-tools": "^0.12.2",
     "sequelize": "^2.0.0-rc8",
     "sequelize-cli": "^1.0.8",
-    "underscore": "^1.7.0"
+    "superagent": "^0.21.0",
+    "underscore": "^1.7.0",
+    "whatwg-fetch": "^0.7.0"
   },
   "devDependencies": {
     "6to5": "^3.3.9",

@@ -1,5 +1,7 @@
 var EventEmitter = require('events').EventEmitter;
 var AppDispatcher = require('../dispatcher/app-dispatcher.js');
+var assign = require('object-assign');
+
 
 const CHANGE_EVENT = 'change';
 
@@ -14,8 +16,14 @@ const CHANGE_EVENT = 'change';
 
 
 class Store extends EventEmitter {
-  constructor() {
+  constructor(defaultState) {
+    if (!defaultState) {
+      console.warn('Store should be instantiated with an object representing its default state.');
+    }
+
+    this.merge = assign;
     this.CALLBACKS = {};
+    this.defaultState = defaultState || {};
 
     this.dispatchToken = AppDispatcher.register((payload) => {
       let [ actionClass, handler ] = payload.actionType.split('_');
@@ -30,13 +38,16 @@ class Store extends EventEmitter {
 
       if (callback) {
         this[callback](payload.data);
-        this.emitChange();
       }
     });
   }
 
   setInitialState() {
-    // This method should be overridden with custom behaviour.
+    if (this.isInitialized()) {
+      return;
+    }
+
+    this.setState(assign(this.getState(), this.defaultState));
   }
 
   // Create a dictionary with mappings from an action (i.e. 'create'),
@@ -56,7 +67,7 @@ class Store extends EventEmitter {
     actionClass.ACTIONS.forEach((action) => {
       var derivedHandler = _deriveHandler(action);
 
-      if (this[derivedHandler] && typeof this[derivedHandler] === 'function') {
+      if (this[derivedHandler] && isFunction(this[derivedHandler])) {
         // Map the store's callback to the action type.
         this.CALLBACKS[actionClass.name][action] = derivedHandler;
       }
@@ -79,18 +90,20 @@ class Store extends EventEmitter {
   **/
 
   listenTo(callback, ctx, onAfterBind) {
-    if ((!callback || typeof callback !== 'function') || !ctx) {
+    if (!callback || !isFunction(callback) || !ctx) {
       throw new Error('listenTo must be passed a callback function and object context.');
     }
 
     this.on(CHANGE_EVENT, callback.bind(ctx, this.getState()));
 
+    // If the store hasn't been initialized, set its initial state
+    // and toggle the initialized flag.
     if (!this.isInitialized()) {
-      this.setInitialized();
       this.setInitialState();
+      this.setInitialized();
     }
 
-    typeof onAfterBind === 'function' && onAfterBind(this.getState());
+    isFunction(onAfterBind) && onAfterBind(this.getState());
   }
 
   stopListeningTo(callback) {
@@ -103,6 +116,7 @@ class Store extends EventEmitter {
 
   setState(newState) {
     _STATE = newState;
+    this.emitChange();
   }
 
   isInitialized() {
@@ -123,6 +137,10 @@ var _hasBeenInitialized = false;
 // For example, 'destroy' becomes 'onDestroy'.
 function _deriveHandler(action) {
   return `on${action.charAt(0).toUpperCase()}${action.slice(1)}`;
+}
+
+function isFunction(fn) {
+  return typeof fn === 'function';
 }
 
 module.exports = Store;

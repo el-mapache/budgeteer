@@ -1,6 +1,5 @@
 var assign = require('object-assign');
 
-
 module.exports = (function consumer() {
   var _STORE = null;
 

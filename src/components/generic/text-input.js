@@ -9,22 +9,38 @@ var TextInput = React.createClass({
     };
   },
 
+  getInitialState: function() {
+    return {
+      value: ''
+    }
+  },
+
+  componentWillRecieveProps: function() {
+    console.log('input',arguments)
+  },
+
   render: function() {
+    this.state.value = this.props.value
     return (
       <div onClick={this.focusInput} className="input-field col s8">
         <input onFocus={this.floatLabel}
                onBlur={this.floatLabel}
-               onChange={this.handleChange}
+               onChange={this.props.onChange}
                type="text"
                name={this.props.name}
-               defaultValue={this.props.defaultValue}
+               value={this.props.value}
                className={this.props.className}/>
         <label htmlFor={this.props.name}>{this.props.labelText}</label>
       </div>
     );
   },
 
+  // this should be a component with a declarative animation.
   floatLabel: function(evt) {
+    if (this.props.value) {
+      return;
+    }
+
     var label = this.getDOMNode().querySelector('label');
     var transforms = {};
 
@@ -41,10 +57,6 @@ var TextInput = React.createClass({
 
   focusInput: function() {
     this.getDOMNode().querySelector('input').focus();
-  },
-
-  handleChange: function(evt) {
-    this.setState({value: evt.target.value});
   }
 });
 

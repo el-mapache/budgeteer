@@ -1,24 +1,31 @@
 var Store = require('./store.js');
 var BudgetActions = require('../actions/budget-actions.js');
-var assign = require('object-assign');
+var request = require('superagent');
+
+var defaultState = {
+  budgets: [],
+  errors: [],
+  editing: false,
+  creating: true,
+  message: ''
+};
 
 class BudgetStore extends Store {
-  constructor() {
-    super();
+  constructor(defaultState) {
+    super(defaultState);
     this.bindToActions(BudgetActions);
   }
 
-  setInitialState() {
-    this.setState(assign(this.getState(), {
-      budgets: [],
-      editing: false
-    }));
-
-    this.emitChange();
-  }
-
   onCreate(data) {
-
+    request.
+    post('/budgets/create').
+    send({
+      data: data
+    }).
+    end((response) => {
+      var stateDelta = this.merge(response.body, {creating: false});
+      this.setState(this.merge(this.getState(), stateDelta));
+    });
   }
 
   onUpdate(data) {
@@ -31,10 +38,12 @@ class BudgetStore extends Store {
 
   onNew() {
     let previousState = this.getState();
-    let newState = {editing: true};
-    this.setState(assign(previousState, newState));
-    console.log('state is now', this.getState());
+    let newState = {
+      creating: true
+    };
+
+    this.setState(this.merge(previousState, newState));
   }
 }
 
-module.exports = new BudgetStore();
+module.exports = new BudgetStore(defaultState);

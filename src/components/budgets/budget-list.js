@@ -3,7 +3,9 @@ var React = require('react');
 var BudgetList = React.createClass({
   render: function() {
     return (
-      <ul></ul>
+      <section>
+        <ul></ul>
+      </section>
     )
   }
 });

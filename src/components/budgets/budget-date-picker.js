@@ -1,41 +1,26 @@
 var React = require('react');
-var moment = require('moment');
+var DateFormatter = require('../../mixins/date-formatter.js');
 var DatePicker = require('react-day-picker');
 
-function valueToDate(s) {
-  var date = moment(s, 'DD-MM-YYYY', true);
-  return date.isValid() ? date : null;
-}
-
-function dateToValue(d) {
-  return d.format('DD-MM-YYYY');
-}
-
-function isToday(dateA, dateB) {
-  return dateA.startOf('day').isSame(dateB.startOf('day'));
-}
-
 var BudgetDatePicker = React.createClass({
-  getInitialState() {
-    return {value: dateToValue(moment())};
-  },
+  mixins: [DateFormatter],
 
   getModifiers() {
     var modifiers = {
-      today(day) {
-        return isToday(moment(), day);
-      },
+      today: function(day) {
+        return this.isToday(this.getMoment(), day);
+      }.bind(this),
 
-      disabled(day) {
-        return day.diff(moment(), 'day') < 0;
-      },
+      disabled: function(day) {
+        return this.isBeforeToday(day);
+      }.bind(this),
 
       selected: function(day) {
-        let value = valueToDate(this.state.value);
+        let value = this.valueToMoment(this.props.value);
         if (modifiers.disabled(day) || !value) {
           return false;
         } else {
-          return isToday(value, day);
+          return this.isToday(value, day);
         }
       }.bind(this)
     };
@@ -47,7 +32,10 @@ var BudgetDatePicker = React.createClass({
     return (
       <div className={this.props.className}>
         <label style={{marginBottom: '20px', display: 'inline-block'}}>{this.props.labelText}</label>
-        <DatePicker enableOutsideDays={true} initialMonth={ valueToDate(this.state.value) || moment() } modifiers={this.getModifiers()} />
+        <DatePicker enableOutsideDays={true}
+                    initialMonth={this.valueToMoment(this.props.value)}
+                    modifiers={this.getModifiers()}
+                    onDayClick={this.props.onDayClick} />
       </div>
     );
   }
