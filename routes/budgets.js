@@ -40,7 +40,6 @@ exports.show = function(req, res) {
 
 exports.create = function(req, res) {
   Budget.create(req.body.data).success(function(budget) {
-    console.log('success???', arguments)
     res.status(201).json({message: 'Budget successfully created.', budget: budget});
   }).error(function(error) {
     console.log('error', error)

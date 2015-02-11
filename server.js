@@ -6,8 +6,11 @@ var bodyParser = require('body-parser');
 var morgan = require('morgan');
 var multer = require('multer');
 var session = require('express-session');
+var configs = require('./config/env.js');
+var flash = require('connect-flash');
+var passport = require('passport');
 
-var routes = require('./routes/index.js');
+require('./config/passport.js')(passport, configs.development.auth);
 
 var app = express();
 
@@ -23,6 +26,13 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(methodOverride());
 app.use(cookieParser());
+app.use(flash());
+
+app.use(session({secret: configs.development.sessionSecret}));
+app.use(passport.initialize());
+app.use(passport.session());
+
+var routes = require('./routes/index.js')(passport);
 
 app.use('/build', express.static(__dirname + '/build'));
 app.use('/', routes);
@@ -48,5 +58,5 @@ app.use(function(err, req, res, next) {
 });
 
 var server = app.listen(app.get('port'), function() {
-  logger('Express server listening on port ' + server.address().port);
+  morgan('Express server listening on port ' + server.address().port);
 });

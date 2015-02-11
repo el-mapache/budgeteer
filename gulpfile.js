@@ -73,7 +73,7 @@ gulp.task('db:drop', function() {
 
 gulp.task('db:sync', function() {
   var models = require('./models');
-  models.sequelize.sync().complete(function(syncError) {
+  models.sequelize.sync({force: true}).complete(function(syncError) {
     if (syncError) {
       return console.log(syncError.message);
     }
@@ -82,15 +82,17 @@ gulp.task('db:sync', function() {
   });
 });
 
+gulp.task('db:setup', ['db:drop', 'db:create', 'db:sync']);
+
 // Utilz
 function watchifyScript() {
   var bundler = browserReg({
     entries: ['./src/index.js'],
     transform: [reactify, to5ify],
     debug: false,
-    cache: {}, // required for watchify
-    packageCache: {}, // required for watchify
-    fullPaths: true // required to be true only for watchify
+    cache: {},
+    packageCache: {},
+    fullPaths: true
   });
 
   var rebundle = function() {

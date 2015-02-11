@@ -3,7 +3,7 @@ var moment = require('moment');
 module.exports = function(sequelize, DataTypes) {
   var Budget = sequelize.define('Budget', {
     title: {
-      type: DataTypes.CHAR,
+      type: DataTypes.STRING,
       allowNull: false,
       validate: {
         len: [1, 255]

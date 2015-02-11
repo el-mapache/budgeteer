@@ -2,18 +2,20 @@ var Store = require('./store.js');
 var BudgetActions = require('../actions/budget-actions.js');
 var request = require('superagent');
 
-var defaultState = {
-  budgets: [],
-  errors: [],
-  editing: false,
-  creating: true,
-  message: ''
-};
-
 class BudgetStore extends Store {
-  constructor(defaultState) {
-    super(defaultState);
+  constructor() {
+    super();
     this.bindToActions(BudgetActions);
+  }
+
+  getInitialState() {
+    return {
+      budgets: [],
+      errors: [],
+      editing: false,
+      creating: true,
+      message: ''
+    };
   }
 
   onCreate(data) {
@@ -46,4 +48,4 @@ class BudgetStore extends Store {
   }
 }
 
-module.exports = new BudgetStore(defaultState);
+module.exports = new BudgetStore();

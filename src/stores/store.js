@@ -16,14 +16,9 @@ const CHANGE_EVENT = 'change';
 
 
 class Store extends EventEmitter {
-  constructor(defaultState) {
-    if (!defaultState) {
-      console.warn('Store should be instantiated with an object representing its default state.');
-    }
-
+  constructor() {
     this.merge = assign;
     this.CALLBACKS = {};
-    this.defaultState = defaultState || {};
 
     this.dispatchToken = AppDispatcher.register((payload) => {
       let [ actionClass, handler ] = payload.actionType.split('_');
@@ -42,12 +37,18 @@ class Store extends EventEmitter {
     });
   }
 
+  // this method should be overwritten by subclasses
+  getInitialState() {
+    return {};
+  }
+
   setInitialState() {
     if (this.isInitialized()) {
       return;
     }
 
-    this.setState(assign(this.getState(), this.defaultState));
+    this.setInitialized();
+    this.setState(assign(this.getState(), this.getInitialState()));
   }
 
   // Create a dictionary with mappings from an action (i.e. 'create'),
@@ -100,7 +101,6 @@ class Store extends EventEmitter {
     // and toggle the initialized flag.
     if (!this.isInitialized()) {
       this.setInitialState();
-      this.setInitialized();
     }
 
     isFunction(onAfterBind) && onAfterBind(this.getState());
