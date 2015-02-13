@@ -22,13 +22,19 @@ module.exports = function(passport) {
     });
   });
 
+  // Both budgets and transactions require a user to be authenticated to view.
+  // router.use('/budgets', isAuthenticated);
+  // router.use('/transactions', isAuthenticated);
+
+
   router.get('/login', session.new);
   router.post('/login', session.create);
   router.get('/logout', session.destroy);
+
   router.get('/signup', registration.new);
-  router.post('/signup', registration.create);
 
   router.get('/budgets', budgets.index);
+  router.get('/budgets/new', budgets.new);
   router.get('/budgets/:id', budgets.show);
   router.post('/budgets/create', budgets.create);
   router.put('/budgets/:id', budgets.update);
@@ -39,7 +45,7 @@ module.exports = function(passport) {
       return next();
     }
 
-    res.redirect('/');
+    res.redirect('/signup');
   }
   return router;
 };

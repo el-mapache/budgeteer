@@ -1,17 +1,25 @@
+var sequelize = require('sequelize');
 var Budget = require('../models').Budget;
+var User = require('../models').User;
+
+exports.new = function(req, res) {
+  res.status(200).render('index', {
+    budgets: JSON.stringify({})
+  });
+};
 
 exports.index = function(req, res) {
-  Budget.findAll({
-    attributes: Budget.publicParams
-  }).then(function(budgets) {
+  // TODO swap this to Budgets.getAllByUser
+  User.allBudgets(1).then(function(budgets) {
     res.format({
       html: function() {
         res.status(200).render('index', {
           budgets: JSON.stringify(budgets)
         });
       },
+
       json: function() {
-        res.status(200).json({
+       res.status(200).json({
           budgets: budgets
         });
       }
@@ -39,13 +47,11 @@ exports.show = function(req, res) {
 };
 
 exports.create = function(req, res) {
-  Budget.create(req.body.data).success(function(budget) {
+  User.createBudget(1, req.body.data).then(function(budget) {
+    console.log('budget?', budget);
     res.status(201).json({message: 'Budget successfully created.', budget: budget});
-  }).error(function(error) {
-    console.log('error', error)
-    Budget.build(req.body.data).validate().then(function() {
-      console.log('y no valid', arguments)
-    })
+  }).catch(function(error) {
+    console.log(error)
     res.status(400).json({errors: error});
   });
 };

@@ -34,6 +34,7 @@ var Budgeteer = React.createClass({
 var routes = (
   <Route name="budgeteer" path="/" handler={Budgeteer}>
     <Route name="budgets" handler={BudgetPane} />
+    <Route name="budgets/new" handler={BudgetPane} />
     <Route name="signup" handler={SignupPane} />
     <DefaultRoute handler={BudgetPane}/>
   </Route>
