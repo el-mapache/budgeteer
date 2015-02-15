@@ -9,13 +9,11 @@ var RouteHandler = Router.RouteHandler;
 
 var Header = require('./header.js');
 var BudgetPane = require('./budgets/budget-pane.js');
+var NewBudget = require('./budgets/new-budget.js');
 var SignupPane = require('./signup-pane.js');
-
-/**
-  *- bootstrap store on page load in router?
-  *- have api send data on page load and set it in a script that I can
-  *  read from?  this idea is probably better.
-**/
+var BudgetList = require('./budgets/budget-list.js');
+var NewTransaction = require('./transactions/new-transaction.js');
+var ViewBudget = require('./budgets/view-budget.js');
 
 
 var Budgeteer = React.createClass({
@@ -33,15 +31,18 @@ var Budgeteer = React.createClass({
 
 var routes = (
   <Route name="budgeteer" path="/" handler={Budgeteer}>
-    <Route name="budgets" handler={BudgetPane} />
-    <Route name="budgets/new" handler={BudgetPane} />
+    <Route name="budgets" handler={BudgetPane}>
+      <Route path="new" handler={NewBudget} />
+      <Route path=":budgetId" handler={ViewBudget}>
+        <Route path="transactions/new" handler={NewTransaction}/>
+      </Route>
+      <DefaultRoute handler={BudgetList}/>
+    </Route>
     <Route name="signup" handler={SignupPane} />
-    <DefaultRoute handler={BudgetPane}/>
+    <DefaultRoute handler={SignupPane}/>
   </Route>
 );
 
-//<DefaultRoute handler={BudgetPane}/>
 Router.run(routes, Router.HistoryLocation, function(Handler) {
   React.render(<Handler/>, document.getElementById('budgeteer'));
 });
-

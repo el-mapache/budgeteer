@@ -37,6 +37,8 @@ module.exports = function(sequelize, DataTypes) {
       validEndDate: function() {
         if (moment(this.endDate).isBefore(moment(this.startDate))) {
           throw new Error('Budget cannot end before it begins.');
+        } else if (!(moment(this.startDate).diff(moment(this.endDate)))) {
+          throw new Error('Must must be more than a day long.');
         }
       }
     },
@@ -44,6 +46,16 @@ module.exports = function(sequelize, DataTypes) {
       associate: function(models) {
         Budget.hasMany(models.Transaction);
         Budget.belongsToMany(models.User);
+      },
+
+      allForUser: function(userId) {
+        var query = 'SELECT b.* FROM "Budgets" AS "b" INNER JOIN "BudgetsUsers" AS "bu" ON "bu"."BudgetId"="b"."id" WHERE "bu"."UserId"=:id';
+        return sequelize.query(query, Budget, { raw: false }, { id: userId });
+      },
+
+      oneForUser: function(userId, budgetId) {
+        var query = 'select "b".* from "Budgets" as "b" inner join "BudgetsUsers" as "bu" on "b"."id"=:BudgetId where "bu"."UserId"=:UserId';
+        return sequelize.query(query, Budget, { raw: false }, { BudgetId: budgetId, UserId: userId });
       },
 
       publicParams: ['title', 'total', 'startDate', 'endDate', 'createdAt', 'id']

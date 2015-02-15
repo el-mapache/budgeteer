@@ -9,6 +9,7 @@ var session = require('express-session');
 var configs = require('./config/env.js');
 var flash = require('connect-flash');
 var passport = require('passport');
+var RedisStore = require('connect-redis')(session);
 
 
 var app = express();
@@ -27,7 +28,14 @@ require('./config/passport.js')(passport, configs[app.get('env')].auth);
 
 app.use(session({
   secret: configs.development.sessionSecret,
-  maxAge: 3600000
+  resave: false,
+  saveUnitialized: true,
+  cookie: {
+    maxAge: 3600000 * 24
+  },
+  store: new RedisStore({
+    db: 2
+  })
 }));
 
 // TODO: this installs passport for all routes.  might want to think about a subset

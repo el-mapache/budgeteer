@@ -9,6 +9,14 @@ module.exports = {
     return moment();
   },
 
+  humanize: function(dateString) {
+    return moment(dateString).format("MMMM Do");
+  },
+
+  difference: function(from, to) {
+    return moment(from).diff(to, 'days') + ' days';
+  },
+
   valueToMoment: function(dateString) {
     var date = moment(dateString, 'DD-MM-YYYY', true);
 

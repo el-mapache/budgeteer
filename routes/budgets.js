@@ -9,40 +9,47 @@ exports.new = function(req, res) {
 };
 
 exports.index = function(req, res) {
-  // TODO swap this to Budgets.getAllByUser
-  User.allBudgets(1).then(function(budgets) {
-    res.format({
-      html: function() {
-        res.status(200).render('index', {
-          budgets: JSON.stringify(budgets)
-        });
-      },
+  var userId = req.session.passport.user
+  res.format({
+    html: function() {
+      res.status(200).render('index');
+    },
 
-      json: function() {
-       res.status(200).json({
+    json: function() {
+      Budget.allForUser(userId).then(function(budgets) {
+        res.status(200).json({
           budgets: budgets
         });
-      }
-    });
-  }).catch(function(err) {
-    res.status(500).json({errors: [err]});
+      }).catch(function(err) {
+        res.status(500).json({errors: [err]});
+      });
+    }
   });
 };
 
 exports.show = function(req, res) {
-  Budget.find({
-    where: {
-      id: req.params.id
-    },
-    attributes: Budget.publicParams
-  }).then(function(budget) {
-    if (budget) {
-      res.status(200).json({budget: budget});
-    } else {
-      res.status(404).json({errors: [{ message: 'Budget not found.'}]});
-    }
-  }).catch(function(errors) {
-    res.status(500).json({errors: [{message: 'The server encountered an error.'}]});
+  Budget.oneForUser(1,6).then(function(budget) {
+    res.format({
+      html: function() {
+        if (budget) {
+          console.log(budget)
+          res.status(200).render('index', {budget: budget});
+        } else {
+          res.status(404).json({errors: [{ message: 'Budget not found.'}]});
+        }
+      },
+
+      json: function() {
+        if (budget) {
+          res.status(200).json({budget: budget});
+        } else {
+          res.status(404).json({errors: [{ message: 'Budget not found.'}]});
+        }
+      }
+    });
+  }).catch(function(error) {
+    console.log('ERROR', error);
+    res.status(500).json({errors: [error]});
   });
 };
 

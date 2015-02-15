@@ -19,14 +19,28 @@ class BudgetStore extends Store {
   }
 
   onCreate(data) {
-    request.
-    post('/budgets/create').
-    send({
-      data: data
-    }).
-    end((response) => {
+    request.post('/budgets/create')
+    .send({ data: data })
+    .end((response) => {
       var stateDelta = this.merge(response.body, {creating: false});
       this.setState(this.merge(this.getState(), stateDelta));
+    });
+  }
+
+  onGetAll() {
+    request.get('/budgets')
+    .set('Accept', 'application/json')
+    .end((response) => {
+      this.setState(this.merge(this.getState(), response.body));
+    });
+  }
+
+  onGet(data) {
+    // Check the cache first
+    request.get(data.id)
+    .set('Accept', 'application/json')
+    .end((response) => {
+
     });
   }
 
@@ -39,8 +53,8 @@ class BudgetStore extends Store {
   }
 
   onNew() {
-    let previousState = this.getState();
-    let newState = {
+    var previousState = this.getState();
+    var newState = {
       creating: true
     };
 

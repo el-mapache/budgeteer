@@ -3,6 +3,7 @@ var router = express.Router();
 var budgets = require('./budgets.js');
 var session = require('./sessions.js');
 var registration = require('./registrations.js');
+var transactions = require('./transactions.js');
 
 
 module.exports = function(passport) {
@@ -22,10 +23,7 @@ module.exports = function(passport) {
     });
   });
 
-  // Both budgets and transactions require a user to be authenticated to view.
-  // router.use('/budgets', isAuthenticated);
-  // router.use('/transactions', isAuthenticated);
-
+  router.use('/budgets', isAuthenticated);
 
   router.get('/login', session.new);
   router.post('/login', session.create);
@@ -35,10 +33,17 @@ module.exports = function(passport) {
 
   router.get('/budgets', budgets.index);
   router.get('/budgets/new', budgets.new);
-  router.get('/budgets/:id', budgets.show);
+  router.get('/budgets/:budgetId', budgets.show);
   router.post('/budgets/create', budgets.create);
-  router.put('/budgets/:id', budgets.update);
-  router.delete('/budgets/:id', budgets.destroy);
+  router.put('/budgets/:budgetId', budgets.update);
+  router.delete('/budgets/:budgetId', budgets.destroy);
+
+  router.get('/budgets/:budgetId/transactions', transactions.index);
+  router.get('/budgets/:budgetId/transactions/new', transactions.new);
+  router.get('/budgets/:budgetId/transactions/:transactionId', transactions.show);
+  router.post('/budgets/:budgetId/transactions/create', transactions.create);
+
+  //router.use('/transactions/*', isAuthenticated);
 
   function isAuthenticated(req, res, next) {
     if (req.isAuthenticated()) {
@@ -47,6 +52,7 @@ module.exports = function(passport) {
 
     res.redirect('/signup');
   }
+
   return router;
 };
 

@@ -5,7 +5,7 @@ var DatePicker = require('react-day-picker');
 var BudgetDatePicker = React.createClass({
   mixins: [DateFormatter],
 
-  getModifiers() {
+  getModifiers: function() {
     var modifiers = {
       today: function(day) {
         return this.isToday(this.getMoment(), day);
@@ -16,7 +16,7 @@ var BudgetDatePicker = React.createClass({
       }.bind(this),
 
       selected: function(day) {
-        let value = this.valueToMoment(this.props.value);
+        var value = this.valueToMoment(this.props.value);
         if (modifiers.disabled(day) || !value) {
           return false;
         } else {
@@ -28,7 +28,7 @@ var BudgetDatePicker = React.createClass({
     return modifiers;
   },
 
-  render() {
+  render: function() {
     return (
       <div className={this.props.className}>
         <label style={{marginBottom: '20px', display: 'inline-block'}}>{this.props.labelText}</label>
