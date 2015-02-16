@@ -62,7 +62,7 @@ var routes = require('./routes/index.js')(passport);
 app.use('/', routes);
 
 app.use(function(err, req, res, next) {
-  console.log('ERROR', err)
+  console.log('ERROR Status', err)
   res.status(err.status || 500);
   res.render('error', {
     message: err.message,

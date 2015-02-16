@@ -15,6 +15,7 @@ var BudgetList = require('./budgets/budget-list.js');
 var NewTransaction = require('./transactions/new-transaction.js');
 var ViewBudget = require('./budgets/view-budget.js');
 
+var ts = require('../stores/transaction-store.js');
 
 var Budgeteer = React.createClass({
 	render: function() {

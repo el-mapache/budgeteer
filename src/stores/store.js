@@ -24,7 +24,8 @@ class Store extends EventEmitter {
       let [ actionClass, handler ] = payload.actionType.split('_');
 
       // This store hasn't been bound to the action class.
-      if (!actionClass in this.CALLBACKS) {
+      // TODO is this tested? NO, WRITE A TEST!!
+      if (!(actionClass in this.CALLBACKS)) {
         return;
       }
 

@@ -54,8 +54,19 @@ module.exports = function(sequelize, DataTypes) {
       },
 
       oneForUser: function(userId, budgetId) {
-        var query = 'select "b".* from "Budgets" as "b" inner join "BudgetsUsers" as "bu" on "b"."id"=:BudgetId where "bu"."UserId"=:UserId';
+        var query = 'SELECT "b".* FROM "Budgets" AS "b" INNER JOIN "BudgetsUsers" AS "bu" ON "bu"."BudgetId"="b"."id" WHERE "bu"."UserId"=:UserId AND "bu"."BudgetId"=:BudgetId';
         return sequelize.query(query, Budget, { raw: false }, { BudgetId: budgetId, UserId: userId });
+      },
+
+      createForUser: function(userId, attrs) {
+        return sequelize.transaction(function(t) {
+          return Budget.create(attrs, {transaction: t}).then(function(budget) {
+            return User.find(userId, {transaction: t}).then(function(user) {
+              // assign user to be owner of budget, automatically creates join table entry.
+              return user.addBudget(budget, {transaction: t});
+            });
+          });
+        });
       },
 
       publicParams: ['title', 'total', 'startDate', 'endDate', 'createdAt', 'id']

@@ -5,6 +5,14 @@ var DatePicker = require('react-day-picker');
 var BudgetDatePicker = React.createClass({
   mixins: [DateFormatter],
 
+  formatInitialDate: function() {
+    if (!this.props.value) {
+      return this.getMoment();
+    }
+
+    return this.valueToMoment(this.props.value);
+  },
+
   getModifiers: function() {
     var modifiers = {
       today: function(day) {
@@ -33,7 +41,7 @@ var BudgetDatePicker = React.createClass({
       <div className={this.props.className}>
         <label style={{marginBottom: '20px', display: 'inline-block'}}>{this.props.labelText}</label>
         <DatePicker enableOutsideDays={true}
-                    initialMonth={this.valueToMoment(this.props.value)}
+                    initialMonth={this.formatInitialDate()}
                     modifiers={this.getModifiers()}
                     onDayClick={this.props.onDayClick} />
       </div>

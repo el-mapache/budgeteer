@@ -3,28 +3,19 @@ var Button           = require('../generic/button.js');
 var TextInput        = require('../generic/text-input.js');
 var BudgetDatePicker = require('./budget-date-picker.js');
 var BudgetActions = require('../../actions/budget-actions.js');
-var DateFormatter = require('../../mixins/date-formatter.js');
-var _                = require('underscore');
+var FormUtils = require('../../mixins/form-utils.js');
 var Link = require('react-router').Link;
 
 var NewBudget = React.createClass({
-  mixins: [DateFormatter],
+  mixins: [FormUtils],
 
   getInitialState: function() {
-    var moment = this.getMoment();
-
     return {
       title: '',
       total: '',
-      startDate: this.momentToValue(moment),
-      endDate: this.momentToValue(moment)
+      startDate: '',
+      endDate: ''
     };
-  },
-
-  setDay: function(field, day, modifiers, event) {
-    var nextState = {};
-    nextState[field] = this.momentToValue(day);
-    this.setState(nextState);
   },
 
   render: function() {
@@ -52,13 +43,6 @@ var NewBudget = React.createClass({
 
     BudgetActions.create(this.state);
     this.setState(this.getInitialState());
-  },
-
-  // respond to user input in the text fields and update the form's state.
-  handleInputUpdate: function(evt) {
-    var nextState = {};
-    nextState[evt.target.name] = evt.target.value;
-    this.setState(nextState);
   }
 });
 

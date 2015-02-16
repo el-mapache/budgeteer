@@ -3,9 +3,7 @@ var Budget = require('../models').Budget;
 var User = require('../models').User;
 
 exports.new = function(req, res) {
-  res.status(200).render('index', {
-    budgets: JSON.stringify({})
-  });
+  res.status(200).render('index');
 };
 
 exports.index = function(req, res) {
@@ -28,19 +26,21 @@ exports.index = function(req, res) {
 };
 
 exports.show = function(req, res) {
-  Budget.oneForUser(1,6).then(function(budget) {
+  var userId = req.session.passport.user;
+  var budgetId = req.params.budgetId;
+
+  Budget.oneForUser(userId, budgetId).then(function(budget) {
     res.format({
       html: function() {
-        if (budget) {
-          console.log(budget)
+        if (budget.length) {
           res.status(200).render('index', {budget: budget});
         } else {
-          res.status(404).json({errors: [{ message: 'Budget not found.'}]});
+          res.status(404).render('404', {errors: [{ message: 'Budget not found.'}]});
         }
       },
 
       json: function() {
-        if (budget) {
+        if (budget.length) {
           res.status(200).json({budget: budget});
         } else {
           res.status(404).json({errors: [{ message: 'Budget not found.'}]});
@@ -54,19 +54,43 @@ exports.show = function(req, res) {
 };
 
 exports.create = function(req, res) {
-  User.createBudget(1, req.body.data).then(function(budget) {
-    console.log('budget?', budget);
-    res.status(201).json({message: 'Budget successfully created.', budget: budget});
+  Budget.createForUser(req.session.passport.user, req.body.data).then(function(budget) {
+    res.status(201).json({
+      message: 'Budget successfully created.',
+      budget: budget
+    });
   }).catch(function(error) {
-    console.log(error)
     res.status(400).json({errors: error});
   });
 };
 
 exports.update = function(req, res) {
-
+  Budget.find({
+    where: {
+      id: req.params.budgetId
+    }
+  }).then(function(budget) {
+    budget.updateAttributes(req.body.data).then(function() {
+      console.log('what are the arguments??', arguments);
+    });
+  });
 };
 
-exports.destroy = function() {
+exports.destroy = function(req, res) {
+  Budget.find({
+    where: {
+      id: req.params.budgetId
+    }
+  }).then(function(budget) {
+    if (!budget) {
+      res.status(404).json({errors: [{ message: 'Budget not found.'}]});
+    }
 
+    budget.destroy().then(function() {
+      res.status(200).json({
+        message: 'Budget successfully deleted.',
+        budget: budget
+      });
+    });
+  });
 };

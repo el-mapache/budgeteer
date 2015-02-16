@@ -18,17 +18,6 @@ module.exports = function(sequelize, DataTypes) {
         User.hasMany(models.Transaction);
       },
 
-      allBudgets: function(id) {
-        return sequelize.transaction(function(t) {
-          return User.find(id, {transaction: t}).then(function(user) {
-            return user.getBudgets({
-              attributes: models.Budget.publicParams,
-              joinTableAttributes: []
-            });
-          });
-        });
-      },
-
       findByAuthOrCreate: function(profile, token) {
         var userEmails = profile.emails.reduce(function(memo, emailObj) {
           memo.push(emailObj.value);
@@ -70,18 +59,6 @@ module.exports = function(sequelize, DataTypes) {
             email: user.email
           }).then(function(res) {
             return user;
-          });
-        });
-      },
-
-      createBudget: function(userId, budgetAttrs) {
-        // Start a transaction to atomicize budget creation
-        return sequelize.transaction(function(t) {
-          return User.find(userId, {transaction: t}).then(function(user) {
-            return models.Budget.create(budgetAttrs, {transaction: t}).then(function(budget) {
-              // assign user to be owner of budget, automatically creates join table entry.
-              return user.addBudget(budget, {transaction: t});
-            });
           });
         });
       }

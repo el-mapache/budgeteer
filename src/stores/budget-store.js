@@ -20,6 +20,7 @@ class BudgetStore extends Store {
 
   onCreate(data) {
     request.post('/budgets/create')
+    .set('Accept', 'application/json')
     .send({ data: data })
     .end((response) => {
       var stateDelta = this.merge(response.body, {creating: false});
@@ -36,11 +37,13 @@ class BudgetStore extends Store {
   }
 
   onGet(data) {
-    // Check the cache first
-    request.get(data.id)
+    request.get('/budgets/' + data.budgetId)
     .set('Accept', 'application/json')
     .end((response) => {
-
+      if (response.body.budget) {
+        var stateDelta = {budgets: response.body.budget};
+        this.setState(this.merge(this.getState(), stateDelta));
+      }
     });
   }
 
