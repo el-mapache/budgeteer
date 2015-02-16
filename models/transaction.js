@@ -1,5 +1,7 @@
 var ValidCategories = require('../src/category.js');
+var assign = require('object-assign');
 
+//TODO: add a base model class at some point
 module.exports = function(sequelize, DataTypes) {
   var Transaction = sequelize.define('Transaction', {
     amount: {
@@ -38,6 +40,20 @@ module.exports = function(sequelize, DataTypes) {
       associate: function(models) {
         Transaction.belongsTo(models.Budget);
         Transaction.belongsTo(models.User);
+      },
+
+      allForBudget: function(userId, budgetId) {
+        var query = 'SELECT t.* FROM "Transactions" AS "t" WHERE "t"."BudgetId"=:budgetId AND "t"."UserId"=:userId';
+        var idsObj = {
+          userId: userId,
+          budgetId: budgetId
+        };
+
+        return sequelize.query(query, Transaction, { raw: false }, idsObj);
+      },
+
+      addToBudget: function(userId, attrs) {
+        return Transaction.create(assign(attrs, {UserId: userId}));
       }
     }
   });

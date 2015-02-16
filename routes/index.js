@@ -24,6 +24,7 @@ module.exports = function(passport) {
   });
 
   router.use('/budgets', isAuthenticated);
+  router.use('/transactions', isAuthenticated);
 
   router.get('/login', session.new);
   router.post('/login', session.create);
@@ -43,14 +44,13 @@ module.exports = function(passport) {
   router.get('/budgets/:budgetId/transactions/:transactionId', transactions.show);
   router.post('/budgets/:budgetId/transactions/create', transactions.create);
 
-  //router.use('/transactions/*', isAuthenticated);
 
   function isAuthenticated(req, res, next) {
     if (req.isAuthenticated()) {
       return next();
     }
 
-    res.redirect('/signup');
+    res.status(401).redirect('/signup');
   }
 
   return router;

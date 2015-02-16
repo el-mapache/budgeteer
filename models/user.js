@@ -51,7 +51,7 @@ module.exports = function(sequelize, DataTypes) {
           lastName: profile.name.familyName.trim(),
           firstName: profile.name.givenName.trim()
         }).then(function(user) {
-          models.Identity.create({
+          return models.Identity.create({
             UserId: user.id,
             provider: profile.provider,
             uid: profile.id,
