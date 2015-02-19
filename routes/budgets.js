@@ -1,6 +1,4 @@
-var sequelize = require('sequelize');
 var Budget = require('../models').Budget;
-var User = require('../models').User;
 
 exports.new = function(req, res) {
   res.status(200).render('index');
@@ -8,6 +6,7 @@ exports.new = function(req, res) {
 
 exports.index = function(req, res) {
   var userId = req.session.passport.user
+
   res.format({
     html: function() {
       res.status(200).render('index');

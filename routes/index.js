@@ -43,6 +43,8 @@ module.exports = function(passport) {
   router.get('/budgets/:budgetId/transactions/new', transactions.new);
   router.get('/budgets/:budgetId/transactions/:transactionId', transactions.show);
   router.post('/budgets/:budgetId/transactions/create', transactions.create);
+  router.put('/budgets/:budgetId/transactions/:transactionId', transactions.update);
+  router.delete('/budgets/:budgetId/transactions/:transactionId', transactions.update);
 
 
   function isAuthenticated(req, res, next) {

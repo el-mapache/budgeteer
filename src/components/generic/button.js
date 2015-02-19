@@ -11,7 +11,7 @@ var Button = React.createClass({
     return (
       <button {...this.props}
               className={this.getButtonClass()}>
-      {this.props.icon}{this.props.text}
+        {this.props.icon}{this.props.text}
       </button>
     );
   },

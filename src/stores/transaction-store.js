@@ -12,12 +12,11 @@ class TransactionStore extends Store {
   }
 
   onCreate(data) {
-    request.post('/budgets/' + data.budgetId + '/transactions/create')
+    request.post('/budgets/' + data.BudgetId + '/transactions/create')
     .set('Accept', 'application/json')
     .send({ data: data })
     .end((response) => {
-      var stateDelta = this.merge(response.body, {creating: false});
-      this.setState(this.merge(this.getState(), stateDelta));
+      this.setState(this.merge(this.getState(), response.body));
     });
   }
 }

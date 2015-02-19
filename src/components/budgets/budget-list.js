@@ -23,6 +23,7 @@ var BudgetList = React.createClass({
                 <td className="collection-item">Total</td>
                 <td className="collection-item">Dates</td>
                 <td className="collection-item">Added On</td>
+                <td className="collection-item">Added By</td>
               </tr>
             </thead>
             <tbody>

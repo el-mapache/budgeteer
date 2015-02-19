@@ -11,8 +11,7 @@ var AddBudgetButton = React.createClass({
   render: function() {
     return (
       <Link to="/budgets/new">
-        <i className="mdi-content-add-circle-outline left"></i>
-        <button type="button" className="btn light-blue darken-3">Start a budget</button>
+        <button type="button" className="btn light-blue darken-3">Start a budget <i className="mdi-content-add-circle-outline left"></i></button>
       </Link>
     );
   }

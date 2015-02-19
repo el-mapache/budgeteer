@@ -4,7 +4,7 @@ function normalize(date) {
   return date.replace(/[^\d]+/g, ' ');
 }
 
-module.exports = {
+var dateFormatter = {
   getMoment: function() {
     return moment();
   },
@@ -41,6 +41,22 @@ module.exports = {
   },
 
   isBeforeToday: function(day) {
+    day = typeof day === 'string' ? moment(day) : day;
+
     return day.diff(moment(), 'day') < 0;
+  },
+
+  isBeforeDate: function(first, second) {
+    return moment(second).isBefore(moment(first))
+  },
+
+  stringToDatetime: function(dateString) {
+    if (!dateString) {
+      return null;
+    }
+
+    return moment(dateString.replace('-', ' '), 'DD MM YYYY').format()
   }
 };
+
+module.exports = dateFormatter;

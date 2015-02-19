@@ -5,16 +5,17 @@ var BudgetDatePicker = require('./budget-date-picker.js');
 var BudgetActions = require('../../actions/budget-actions.js');
 var FormUtils = require('../../mixins/form-utils.js');
 var Link = require('react-router').Link;
+var DateFormatter = require('../../mixins/date-formatter.js');
 
 var NewBudget = React.createClass({
-  mixins: [FormUtils],
+  mixins: [FormUtils, DateFormatter],
 
   getInitialState: function() {
     return {
       title: '',
       total: '',
-      startDate: '',
-      endDate: ''
+      startDate: this.momentToValue(this.getMoment()),
+      endDate: this.momentToValue(this.getMoment())
     };
   },
 

@@ -6,12 +6,14 @@ var BudgetListItem = React.createClass({
 
   render: function() {
     var budget = this.props.budget
+
     return (
       <tr key={budget.id}>
         <td className="collection-item">{budget.title}</td>
         <td className="collection-item">{budget.total}</td>
-        <td className="collection-item">{this.humanize(budget.startDate)} - {this.humanize(budget.endDate)} ({this.difference(budget.startDate, budget.endDate)})</td>
+        <td className="collection-item">{this.humanize(budget.startDate)} - {this.humanize(budget.endDate)} ({this.difference(budget.endDate, budget.startDate)})</td>
         <td className="collection-item">{this.humanize(budget.createdAt)}</td>
+        <td className="collection-item">{budget.Users[0].firstName}</td>
         <td><a href={"budgets/" + budget.id}><i className="mdi-content-forward"></i></a></td>
       </tr>
     )

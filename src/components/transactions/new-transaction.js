@@ -8,16 +8,16 @@ var categories = require('../../category.js');
 var TransactionActions = require('../../actions/transaction-actions.js');
 var Router = require('react-router');
 var assign = require('object-assign');
-// var TransactionStore = require('../../stores/transaction-store.js');
+var DateFormatter = require('../../mixins/date-formatter.js');
 
 var NewTransaction = React.createClass({
-  mixins: [FormUtils, Router.State],
+  mixins: [FormUtils, Router.State, DateFormatter],
 
   getInitialState: function() {
     return {
-      cost: '',
-      purchasedOn: '',
-      split: '',
+      amount: '',
+      purchasedOn: this.momentToValue(this.getMoment()),
+      percentageToSplit: 50,
       description: '',
       title: '',
       category: ''
@@ -29,9 +29,9 @@ var NewTransaction = React.createClass({
       <form className="row" onSubmit={this.onSubmitHandler}>
         <div className="col s8 offset-m1">
           <div className="row">
-            <TextInput labelText="Amount Spent" name="cost" value={this.state.cost} onChange={this.handleInputUpdate} />
-            <Select optionsForSelect={this.categoriesToOptions()} />
-            <TextInput labelText="Split Amount" onChange={this.handleInputUpdate} name="split" value={this.state.split} />
+            <TextInput labelText="Amount Spent" name="amount" value={this.state.amount} onChange={this.handleInputUpdate} />
+            <Select optionsForSelect={this.categoriesToOptions()} handleSelect={this.handleSelect} value={this.state.category} />
+            <TextInput labelText="Split Amount" onChange={this.handleInputUpdate} name="percentageToSplit" value={this.state.percentageToSplit} />
             <TextInput labelText="Title" onChange={this.handleInputUpdate} name="title" value={this.state.title} />
             <TextInput labelText="Note" onChange={this.handleInputUpdate} name="note" value={this.state.note} />
             <BudgetDatePicker labelText="Purchased On" className="col s6" onDayClick={this.setDay.bind(this, 'purchasedOn')} value={this.state.purchasedOn} />
@@ -42,10 +42,16 @@ var NewTransaction = React.createClass({
     );
   },
 
+  handleSelect: function(evt) {
+    this.setState({
+      category: evt.target.value
+    });
+  },
+
   onSubmitHandler: function(event) {
     event.preventDefault();
 
-    var formData = assign(this.state, {budgetId: this.getParams().budgetId});
+    var formData = assign(this.state, {BudgetId: parseInt(this.getParams().budgetId, 10)});
 
     TransactionActions.create(formData);
   },

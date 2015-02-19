@@ -2,7 +2,7 @@
 module.exports = {
   setDay: function(field, day, modifiers, event) {
     var nextState = {};
-    nextState[field] = this.momentToValue(day);
+    nextState[field] = day.format('DD-MM-YYYY');
     this.setState(nextState);
   },
 

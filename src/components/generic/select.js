@@ -9,18 +9,13 @@ var Select = React.createClass({
     };
   },
 
-  getInitialState: function() {
-    return {
-      value: 'default'
-    };
-  },
-
   render: function() {
     var self = this;
+    var selected = this.props.value || 'default';
 
     return (
       <div className="input-field col s8">
-        <select className="browser-default" value={this.state.value}>
+        <select className="browser-default" onChange={this.props.handleSelect} value={selected}>
           <option value="default" disabled>Category</option>
           {this.props.optionsForSelect.map(function(option) {
             return (

@@ -1,5 +1,6 @@
 var ValidCategories = require('../src/category.js');
 var assign = require('object-assign');
+var DateFormatter = require('../src/mixins/date-formatter.js');
 
 //TODO: add a base model class at some point
 module.exports = function(sequelize, DataTypes) {
@@ -21,8 +22,8 @@ module.exports = function(sequelize, DataTypes) {
       type: DataTypes.INTEGER(3),
       allowNull: false,
       validate: function(value) {
-        if (value <= 0 || value > 100) {
-          throw new Error('Must be a non-zero value between 1 and 100');
+        if (value <  0 || value > 100) {
+          throw new Error('Must be a value between 0 and 100');
         }
       }
     },
@@ -31,29 +32,43 @@ module.exports = function(sequelize, DataTypes) {
       allowNull: false,
       validate: function(value) {
         if (ValidCategories.indexOf(value) === -1) {
-          throw new Error('Category must be one of the valid category types.');
+          throw new Error('Selected category is invalid.');
         }
       }
     }
   }, {
     classMethods: {
       associate: function(models) {
-        Transaction.belongsTo(models.Budget);
-        Transaction.belongsTo(models.User);
+        Transaction.belongsTo(models.Budget, {foreignKey: {allowNull: false}});
+        Transaction.belongsTo(models.User, {foreignKey: {allowNull: false }});
       },
 
       allForBudget: function(userId, budgetId) {
-        var query = 'SELECT t.* FROM "Transactions" AS "t" WHERE "t"."BudgetId"=:budgetId AND "t"."UserId"=:userId';
-        var idsObj = {
-          userId: userId,
-          budgetId: budgetId
-        };
-
-        return sequelize.query(query, Transaction, { raw: false }, idsObj);
+        return sequelize.models.User.find(userId).then(function(user) {
+          return user.getTransactions({
+            where: {
+              BudgetId: budgetId
+            },
+            attributes: Transaction.publicParams,
+            include: [{
+              model: sequelize.models.User,
+              attributes: ['firstName', 'photo']
+            }]
+          })
+        });
       },
 
+      publicParams: ['category', 'purchasedOn', 'amount', 'percentageToSplit', 'id', 'title', 'description', 'createdAt', 'BudgetId'],
+
       addToBudget: function(userId, attrs) {
-        return Transaction.create(assign(attrs, {UserId: userId}));
+        var newAttrs = assign(attrs, {UserId: userId});
+        return Transaction.create(newAttrs);
+      }
+    },
+    hooks: {
+      beforeCreate: function(t, options, done) {
+        t.purchasedOn = DateFormatter.stringToDatetime(t.purchasedOn);
+        done(null, t);
       }
     }
   });
