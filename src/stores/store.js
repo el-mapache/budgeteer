@@ -3,58 +3,96 @@ var AppDispatcher = require('../dispatcher/app-dispatcher.js');
 var assign = require('object-assign');
 
 
-const CHANGE_EVENT = 'change';
+// BLOCKER need this to stop returning a singleton class, needs to return a constructed object.
+// currently causing bugs with state being overwritten
 
-/**
-  * Default store implementation that other stores can inherit from.
-  * Contains default actions that all stores need to implement. Stores register listeners
-  * from the views which fire whenever a store's data is changed.
-  *
-  * All actions that a store is expected to respond to should be written in the format of
-  * `on${Action}`.
-**/
+var CHANGE_EVENT = 'change';
 
 
-class Store extends EventEmitter {
-  constructor() {
-    this.merge = assign;
+var StoreFactory = function() {
+  var _STATE = {};
+  var _hasBeenInitialized = !!_hasBeenInitialized;
+
+  // Take a raw action, uppercase it, and stick an 'on' in front of it.
+  // For example, 'destroy' becomes 'onDestroy'.
+  function _deriveHandler(action) {
+    return 'on' + action.charAt(0).toUpperCase() + action.slice(1);
+  }
+
+  function isFunction(fn) {
+    return typeof fn === 'function';
+  }
+
+  /**
+    * Default store implementation that other stores can inherit from.
+    * Contains default actions that all stores need to implement. Stores register listeners
+    * from the views which fire whenever a store's data is changed.
+    *
+    * All actions that a store is expected to respond to should be written in the format of
+    * `on${Action}`.
+  **/
+  function Store() {
     this.CALLBACKS = {};
+    this.dispatchToken = AppDispatcher.register(function(payload) {
+      var actionAndHandler = payload.actionType.split('_');
 
-    this.dispatchToken = AppDispatcher.register((payload) => {
-      let [ actionClass, handler ] = payload.actionType.split('_');
+      var actionClass = actionAndHandler[0],
+          handler = actionAndHandler[1];
 
       // This store hasn't been bound to the action class.
-      // TODO is this tested? NO, WRITE A TEST!!
+      // TODO test
       if (!(actionClass in this.CALLBACKS)) {
         return;
       }
 
       // Do we have a mapping to a valid method name on this store?
-      let callback = this.CALLBACKS[actionClass][handler];
+      var callback = this.CALLBACKS[actionClass][handler];
 
       if (callback) {
         this[callback](payload.data);
       }
-    });
+    }.bind(this));
+
+    this.init();
   }
 
-  // this method should be overwritten by subclasses
-  getInitialState() {
+  Store.prototype.merge = assign;
+  Store.prototype.init = function() {};
+
+  Store.prototype.getInitialState = function() {
     return {};
-  }
+  };
 
-  setInitialState() {
+  Store.prototype.setInitialState = function() {
     if (this.isInitialized()) {
       return;
     }
 
     this.setInitialized();
     this.setState(assign(this.getState(), this.getInitialState()));
-  }
+  };
+
+  Store.prototype.setInitialized = function() {
+    _hasBeenInitialized = true;
+  };
+
+  Store.prototype.isInitialized = function() {
+    return _hasBeenInitialized;
+  };
+
+
+  Store.prototype.getState = function() {
+    return _STATE;
+  };
+
+  Store.prototype.setState = function(newState) {
+    _STATE = newState;
+    this.emitChange();
+  };
 
   // Create a dictionary with mappings from an action (i.e. 'create'),
   // to methods names on this class (i.e. 'onCreate').
-  bindToActions(actionClass) {
+  Store.prototype.bindToActions = function(actionClass) {
     this.CALLBACKS[actionClass.name] = {};
 
     /**
@@ -66,17 +104,17 @@ class Store extends EventEmitter {
     **/
 
     // TODO: think about how to allow stores to bind to more than one ActionCreator.
-    actionClass.ACTIONS.forEach((action) => {
+    actionClass.ACTIONS.forEach(function(action) {
       var derivedHandler = _deriveHandler(action);
 
       if (this[derivedHandler] && isFunction(this[derivedHandler])) {
         // Map the store's callback to the action type.
         this.CALLBACKS[actionClass.name][action] = derivedHandler;
       }
-    });
-  }
+    }.bind(this));
+  };
 
-  emitChange() {
+  Store.prototype.emitChange = function() {
     this.emit(CHANGE_EVENT);
   }
 
@@ -91,7 +129,7 @@ class Store extends EventEmitter {
     * @param {onAfterBind} optional callback to receive a copy of store's initial state.
   **/
 
-  listenTo(callback, ctx, onAfterBind) {
+  Store.prototype.listenTo = function(callback, ctx, onAfterBind) {
     if (!callback || !isFunction(callback) || !ctx) {
       throw new Error('listenTo must be passed a callback function and object context.');
     }
@@ -105,43 +143,21 @@ class Store extends EventEmitter {
     }
 
     isFunction(onAfterBind) && onAfterBind(this.getState());
-  }
+  };
 
-  stopListeningTo(callback) {
+  Store.prototype.stopListeningTo = function(callback) {
     this.removeListener(CHANGE_EVENT, callback);
-  }
+  };
 
-  getState() {
-    return _STATE;
-  }
+  Store.prototype.constructor = Store;
 
-  setState(newState) {
-    _STATE = newState;
-    this.emitChange();
-  }
+  return {
+    create: function(storeMixin) {
+      assign(Store.prototype, EventEmitter.prototype, storeMixin);
 
-  isInitialized() {
-    return _hasBeenInitialized;
-  }
+      return new Store();
+    }
+  };
+};
 
-  setInitialized() {
-    _hasBeenInitialized = true;
-  }
-}
-
-/** @private **/
-
-var _STATE = {};
-var _hasBeenInitialized = false;
-
-// Take a raw action, uppercase it, and stick an 'on' in front of it.
-// For example, 'destroy' becomes 'onDestroy'.
-function _deriveHandler(action) {
-  return `on${action.charAt(0).toUpperCase()}${action.slice(1)}`;
-}
-
-function isFunction(fn) {
-  return typeof fn === 'function';
-}
-
-module.exports = Store;
+module.exports = StoreFactory;

@@ -1,14 +1,13 @@
-var Store = require('./store.js');
+var Store = require('./store.js')();
 var BudgetActions = require('../actions/budget-actions.js');
 var request = require('superagent');
 
-class BudgetStore extends Store {
-  constructor() {
-    super();
+module.exports =  Store.create({
+  init: function() {
     this.bindToActions(BudgetActions);
-  }
+  },
 
-  getInitialState() {
+  getInitialState: function() {
     return {
       budgets: [],
       errors: [],
@@ -16,9 +15,9 @@ class BudgetStore extends Store {
       creating: true,
       message: ''
     };
-  }
+  },
 
-  onCreate(data) {
+  onCreate: function(data) {
     request.post('/budgets/create')
     .set('Accept', 'application/json')
     .send({ data: data })
@@ -26,17 +25,17 @@ class BudgetStore extends Store {
       var stateDelta = this.merge(response.body, {creating: false});
       this.setState(this.merge(this.getState(), stateDelta));
     });
-  }
+  },
 
-  onGetAll() {
+  onGetAll: function() {
     request.get('/budgets')
     .set('Accept', 'application/json')
     .end((response) => {
       this.setState(this.merge(this.getState(), response.body));
     });
-  }
+  },
 
-  onGet(data) {
+  onGet: function(data) {
     request.get('/budgets/' + data.budgetId)
     .set('Accept', 'application/json')
     .end((response) => {
@@ -45,17 +44,13 @@ class BudgetStore extends Store {
         this.setState(this.merge(this.getState(), stateDelta));
       }
     });
-  }
+  },
 
-  onUpdate(data) {
+  onUpdate: function(data) {},
 
-  }
+  onDestroy: function(data) {},
 
-  onDestroy(data) {
-
-  }
-
-  onNew() {
+  onNew: function() {
     var previousState = this.getState();
     var newState = {
       creating: true
@@ -63,6 +58,4 @@ class BudgetStore extends Store {
 
     this.setState(this.merge(previousState, newState));
   }
-}
-
-module.exports = new BudgetStore();
+});

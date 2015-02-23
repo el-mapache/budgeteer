@@ -1,24 +1,23 @@
 var assign = require('object-assign');
 
-module.exports = (function consumer() {
-  var _STORE = null;
+var Consumer = {
+  fromStore: function(storeClass) {
+    var _STORE = storeClass;
 
-  return class Consumer {
-    static fromStore(storeClass) {
-      _STORE = storeClass;
+    return {
+      componentWillMount: function() {
+        console.log(_STORE)
+        _STORE.listenTo(this.setState, this, (initialState) => {
+          assign(this.state || {}, initialState);
+        });
+      },
 
-      return {
-        componentWillMount: function() {
-          _STORE.listenTo(this.setState, this, (initialState) => {
-            assign(this.state || {}, initialState);
-          });
-        },
+      componentWillUnmount: function() {
+        _STORE.stopListeningTo(this.setState, this);
+        _STORE = null;
+      }
+    };
+  }
+};
 
-        componentWillUnmount: function() {
-          _STORE.stopListeningTo(this.setState, this);
-          _STORE = null;
-        }
-      };
-    }
-  };
-})();
+module.exports = Consumer;

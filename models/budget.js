@@ -71,7 +71,7 @@ module.exports = function(sequelize, DataTypes) {
               id: budgetId,
             },
             include: [{
-              model: sequelize.model.User,
+              model: sequelize.models.User,
               attributes: ['firstName', 'photo']
             },{
               model: sequelize.models.Transaction,

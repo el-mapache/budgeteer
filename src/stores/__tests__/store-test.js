@@ -1,37 +1,41 @@
+jest.dontMock('events');
 jest.dontMock('../store.js');
 jest.dontMock('../../actions/action-creator.js');
 jest.dontMock('../../actions/budget-actions.js');
 
-describe('Store', function() {
-  let actions = require('../../actions/budget-actions.js');
-  let Store = require('../store.js');
-  let AppDispatcher = require('../../dispatcher/app-dispatcher.js');
+ddescribe('Store', function() {
+  var AppDispatcher = require('../../dispatcher/app-dispatcher.js');
+  // var EventEmitter = require('events').EventEmitter;
 
-  class SweetStore extends Store {
-    constructor() {
-      super();
-      this.bindToActions(actions);
-    }
+  var actions = require('../../actions/budget-actions.js');
+  var Store = require('../store.js')();
 
-    setInitialState() {
-      return {
-        stokeLevel: 'bummed'
-      }
-    }
-
-    onCreate(data) {
-      this.setState(data);
-    }
-  }
-
-  AppDispatcher.register.mockReturnValue('ID_1');
   var store;
 
-  beforeEach(function() {
-    store = new SweetStore();
-  })
+  AppDispatcher.register.mockReturnValue('ID_1');
 
-  var callback = AppDispatcher.register.mock.calls[0][0];
+  beforeEach(function() {
+    store = Store.create({
+      init: function() {
+        this.bindToActions(actions);
+      },
+      getInitialState: function() {
+        return {
+          stokeLevel: 'bummed'
+        };
+      },
+      onCreate: function(data) {
+        this.setState(data);
+      }
+    });
+    callback = AppDispatcher.register.mock.calls[0][0];
+  });
+
+  afterEach(function() {
+    store = null;
+    callback = null;
+  });
+
 
   describe('instantiation', function() {
     it('registers itself with the dispatcher', function() {
@@ -56,7 +60,7 @@ describe('Store', function() {
     });
 
     it('calls appropriate callback when an action is dispatched', function() {
-      let mockAction = {
+      var mockAction = {
         actionType: 'BudgetActions_create',
         data: {
           stokeLevel: 'pitted'
@@ -67,9 +71,10 @@ describe('Store', function() {
       expect(store.getState().stokeLevel).toBe('pitted');
     });
 
-    it('initialises itself when first bound', function() {
-      let store = new SweetStore();
-      expect(store.getState()).toBe({});
+    it('initialises itself when a listener is first bound', function() {
+      store.listenTo(function(){}, this);
+      expect(Object.keys(store.getState()).indexOf('stokeLevel')).toNotBe(-1);
+      expect(store.getState().stokeLevel).toBe('bummed');
     });
   });
 });

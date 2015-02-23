@@ -1,8 +1,24 @@
 var React = require('react');
 var TransactionListItem = require('./transaction-list-item.js');
+var TransactionStore = require('../../stores/transaction-store.js');
+var StoreConsumer = require('../../mixins/store-consumer.js');
+
 
 var TransactionList = React.createClass({
+  mixins: [StoreConsumer.fromStore(TransactionStore)],
+
+  getTransactions: function() {
+    return this.state.transactions.length ? this.state.transactions : this.props.transactions;
+  },
+
+  getInitialState: function() {
+    return {
+      transactions: []
+    };
+  },
+
   render: function() {
+    console.log('t', this.state.transactions)
     return (
       <div>
         <section className="row">
@@ -20,7 +36,7 @@ var TransactionList = React.createClass({
               </tr>
             </thead>
             <tbody>
-              {this.props.transactions.map(function(transaction) {
+              {this.getTransactions().map(function(transaction) {
                 return ( <TransactionListItem key={transaction.id} transaction={transaction} />);
               })}
             </tbody>
