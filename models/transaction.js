@@ -58,7 +58,7 @@ module.exports = function(sequelize, DataTypes) {
         });
       },
 
-      publicParams: ['category', 'purchasedOn', 'amount', 'percentageToSplit', 'id', 'title', 'description', 'createdAt', 'BudgetId'],
+      publicParams: ['category', 'purchasedOn', 'amount', 'percentageToSplit', 'id', 'title', 'description', 'createdAt', 'BudgetId', 'UserId'],
 
       addToBudget: function(userId, attrs) {
         var newAttrs = assign(attrs, {UserId: userId});

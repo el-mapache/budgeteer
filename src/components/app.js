@@ -2,10 +2,8 @@ var React = require('react');
 
 var Router = require('react-router');
 var DefaultRoute = Router.DefaultRoute;
-var Link = Router.Link;
 var Route = Router.Route;
 var RouteHandler = Router.RouteHandler;
-
 
 var Header = require('./header.js');
 var BudgetPane = require('./budgets/budget-pane.js');
@@ -14,8 +12,6 @@ var SignupPane = require('./signup-pane.js');
 var BudgetList = require('./budgets/budget-list.js');
 var NewTransaction = require('./transactions/new-transaction.js');
 var ViewBudget = require('./budgets/view-budget.js');
-
-var ts = require('../stores/transaction-store.js');
 
 var Budgeteer = React.createClass({
 	render: function() {
@@ -33,8 +29,8 @@ var Budgeteer = React.createClass({
 var routes = (
   <Route name="budgeteer" path="/" handler={Budgeteer}>
     <Route name="budgets" handler={BudgetPane}>
-      <Route path="new" handler={NewBudget} />
-      <Route path=":budgetId" handler={ViewBudget}>
+      <Route name="new" path="new" handler={NewBudget} />
+      <Route name="budget" path=":budgetId" handler={ViewBudget}>
         <Route path="transactions/new" handler={NewTransaction}/>
       </Route>
       <DefaultRoute handler={BudgetList}/>

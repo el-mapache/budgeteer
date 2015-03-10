@@ -4,6 +4,8 @@ var budgets = require('./budgets.js');
 var session = require('./sessions.js');
 var registration = require('./registrations.js');
 var transactions = require('./transactions.js');
+var users = require('./users.js');
+var budgetsUsers = require('./budgets-users');
 
 
 module.exports = function(passport) {
@@ -32,12 +34,16 @@ module.exports = function(passport) {
 
   router.get('/signup', registration.new);
 
+  router.get('/users/:id', users.show);
+
   router.get('/budgets', budgets.index);
   router.get('/budgets/new', budgets.new);
   router.get('/budgets/:budgetId', budgets.show);
   router.post('/budgets/create', budgets.create);
   router.put('/budgets/:budgetId', budgets.update);
   router.delete('/budgets/:budgetId', budgets.destroy);
+
+  router.post('/budgets/:budgetId/add-user', budgetsUsers.create);
 
   router.get('/budgets/:budgetId/transactions', transactions.index);
   router.get('/budgets/:budgetId/transactions/new', transactions.new);

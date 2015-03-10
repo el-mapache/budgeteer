@@ -14,9 +14,15 @@ module.exports = function(sequelize, DataTypes) {
   }, {
     classMethods: {
       associate: function(models) {
-        User.belongsToMany(models.Budget);
+        User.belongsToMany(models.Budget, {
+          foreignKey: {
+            name: "BudgetId"
+          }
+        });
         User.hasMany(models.Transaction);
       },
+
+      basicInfo: ['firstName', 'lastName', 'photo', 'email'],
 
       findByAuthOrCreate: function(profile, token) {
         var userEmails = profile.emails.reduce(function(memo, emailObj) {

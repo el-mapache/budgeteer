@@ -6,7 +6,6 @@ var Consumer = {
 
     return {
       componentWillMount: function() {
-        console.log(_STORE)
         _STORE.listenTo(this.setState, this, (initialState) => {
           assign(this.state || {}, initialState);
         });

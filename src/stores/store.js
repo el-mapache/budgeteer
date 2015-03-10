@@ -3,9 +3,6 @@ var AppDispatcher = require('../dispatcher/app-dispatcher.js');
 var assign = require('object-assign');
 
 
-// BLOCKER need this to stop returning a singleton class, needs to return a constructed object.
-// currently causing bugs with state being overwritten
-
 var CHANGE_EVENT = 'change';
 
 
@@ -53,6 +50,8 @@ var StoreFactory = function() {
       }
     }.bind(this));
 
+    this.setState(this.getInitialState());
+
     this.init();
   }
 
@@ -86,14 +85,46 @@ var StoreFactory = function() {
   };
 
   Store.prototype.setState = function(newState) {
-    _STATE = newState;
+    _STATE = this.merge(this.getState(), newState);
     this.emitChange();
   };
 
-  // Create a dictionary with mappings from an action (i.e. 'create'),
-  // to methods names on this class (i.e. 'onCreate').
-  Store.prototype.bindToActions = function(actionClass) {
-    this.CALLBACKS[actionClass.name] = {};
+  /**
+    * Create a dictionary with mappings from an action (i.e. 'create'),
+    * to methods names on this class (i.e. 'onCreate').
+    *
+    * @param {actionClass} object An instance of an ActionCreator class.
+    * @param {map} object A dictionary of bindings from actions to action names.
+    *   Allows for creation of manual bindings to actions rather than automatically deriving
+    *   them based on the name of the action.
+    * @param {skipAutoBind} boolean Create automatic bindings to store actions.
+    *
+    * For example:
+    *
+    * myStore.bindToActions(Users, {
+    *   'afterCreate': 'mergeUsers'
+    * });
+    *
+    * If the supplied callback does not exist on the store, a
+    * noop function will be registered.
+    * All non-specified actions will be auto bound unless the skipAutoBind
+    * is true.
+  **/
+
+  Store.prototype.bindToActions = function(actionClass, map, skipAutoBind) {
+    var callbacks = this.CALLBACKS[actionClass.name] = {};
+
+
+    if (typeof map === 'object') {
+      for (var action in map) {
+        var handler = map[action];
+        callbacks[action] = isFunction(handler) ? handler : function(){};
+      }
+    }
+
+    if (map && skipAutoBind) {
+      return;
+    }
 
     /**
       * Loop through the actions defined in the ActionCreator class
@@ -102,21 +133,23 @@ var StoreFactory = function() {
       * naming convention 'on${Action}'. Therefore, a mapping to an
       * action called 'create' should therefore be named 'onCreate'.
     **/
-
-    // TODO: think about how to allow stores to bind to more than one ActionCreator.
     actionClass.ACTIONS.forEach(function(action) {
+      if (callbacks[action]) {
+        return;
+      }
+
       var derivedHandler = _deriveHandler(action);
 
       if (this[derivedHandler] && isFunction(this[derivedHandler])) {
         // Map the store's callback to the action type.
-        this.CALLBACKS[actionClass.name][action] = derivedHandler;
+        callbacks[action] = derivedHandler;
       }
     }.bind(this));
   };
 
   Store.prototype.emitChange = function() {
     this.emit(CHANGE_EVENT);
-  }
+  };
 
   /**
     * Bind a callback to the store that is passed a copy of the store's new state

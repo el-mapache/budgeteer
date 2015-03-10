@@ -6,5 +6,9 @@
   <body>
     <div id="budgeteer"></div>
     <script src="/build/js/bundle.js"></script>
+    <script>
+      window.budgeteer = window.budgeteer || {};
+      budgeteer.currentUser = {{{ currentUser }}};
+    </script>
   </body>
 </html>

@@ -14,12 +14,13 @@ var NewBudget = React.createClass({
     return {
       title: '',
       total: '',
-      startDate: this.momentToValue(this.getMoment()),
-      endDate: this.momentToValue(this.getMoment())
+      start_date: this.momentToValue(this.getMoment()),
+      end_date: this.momentToValue(this.getMoment())
     };
   },
 
   render: function() {
+    console.log(this.state)
     return (
       <div>
         <Link to="budgets">Back to Budgets</Link>

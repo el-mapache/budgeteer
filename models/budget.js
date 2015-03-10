@@ -18,6 +18,11 @@ module.exports = function(sequelize, DataTypes) {
       }
     },
 
+    ownerId: {
+      type: DataTypes.INTEGER,
+      allowNull: false
+    },
+
     startDate: {
       type: 'Date',
       allowNull: false,
@@ -43,24 +48,34 @@ module.exports = function(sequelize, DataTypes) {
     classMethods: {
       associate: function(models) {
         Budget.hasMany(models.Transaction);
-        Budget.belongsToMany(models.User);
+        Budget.belongsToMany(models.User, {foreignKey: {name: "UserId"}});
       },
 
       allForUser: function(userId) {
-        return sequelize.models.User.find(userId).then(function(user) {
+        var User = sequelize.models.User;
+        return User.find(userId).then(function(user) {
           return user.getBudgets({
             include: [{
-              model: sequelize.models.User,
-              attributes: ['firstName', 'photo']
+              model: User,
+              attributes: User.basicInfo
             }, {
               model: sequelize.models.Transaction,
               attributes: sequelize.models.Transaction.publicParams,
               include: [{
-                model: sequelize.models.User,
-                attributes: ['firstName', 'photo']
+                model: User,
+                attributes: User.basicInfo
               }]
             }]
           });
+        });
+      },
+
+      oneByOwner: function(userId, budgetId) {
+        return Budget.find({
+          where: {
+            ownerId: userId,
+            id: budgetId
+          }
         });
       },
 
@@ -72,25 +87,49 @@ module.exports = function(sequelize, DataTypes) {
             },
             include: [{
               model: sequelize.models.User,
-              attributes: ['firstName', 'photo']
+              attributes: sequelize.models.User.basicInfo
             },{
               model: sequelize.models.Transaction,
               attributes: sequelize.models.Transaction.publicParams,
               include: [{
                 model: sequelize.models.User,
-                attributes: ['firstName', 'photo']
+                attributes: sequelize.models.User.basicInfo
               }]
-            }]
+            }],
+            attributes: Budget.publicParams
           });
         });
       },
 
       createForUser: function(userId, attrs) {
         return sequelize.transaction(function(t) {
-          return Budget.create(attrs, {transaction: t}).then(function(budget) {
-            return sequelize.models.User.find(userId, {transaction: t}).then(function(user) {
-              // assign user to be owner of budget, automatically creates join table entry.
+          return sequelize.models.User.find(userId, {transaction: t}).then(function(user) {
+            attrs.ownerId = userId;
+            return Budget.create(attrs, {transaction: t}).then(function(budget) {
+              // create a join table entry as well.
               return user.addBudget(budget, {transaction: t});
+            });
+          });
+        });
+      },
+
+      addUser: function(ownerId, budgetId, userEmail) {
+        var defered = sequelize.Promise.defer();
+
+        return sequelize.transaction(function(t) {
+          return sequelize.models.User.find({
+            where: {
+              email: userEmail
+            }
+          }, {transaction: t}).then(function(user) {
+            return Budget.oneByOwner(ownerId, budgetId, {transaction: t}).then(function(budget) {
+              console.log(budget.startDate)
+              return user.addBudget(budget, {transaction: t}).then(function() {
+                defered.resolve(user);
+                return defered.promise;
+              }).catch(function(e) {
+                console.log(e)
+              })
             });
           });
         });

@@ -1,11 +1,15 @@
 var Budget = require('../models').Budget;
 
+var getUserId = function(req) {
+  return req.session.passport.user.id;
+};
+
 exports.new = function(req, res) {
   res.status(200).render('index');
 };
 
 exports.index = function(req, res) {
-  var userId = req.session.passport.user
+  var userId = getUserId(req)
 
   res.format({
     html: function() {
@@ -18,14 +22,14 @@ exports.index = function(req, res) {
           budgets: budgets
         });
       }).catch(function(err) {
-        res.status(500).json({errors: [err]});
+        res.status(500).json({errors: [{message: err}]});
       });
     }
   });
 };
 
 exports.show = function(req, res) {
-  var userId = req.session.passport.user;
+  var userId = getUserId(req);
   var budgetId = req.params.budgetId;
 
   Budget.oneForUser(userId, budgetId).then(function(budget) {
@@ -53,7 +57,7 @@ exports.show = function(req, res) {
 };
 
 exports.create = function(req, res) {
-  Budget.createForUser(req.session.passport.user, req.body.data).then(function(budget) {
+  Budget.createForUser(getUserId(req), req.body.data).then(function(budget) {
     res.status(201).json({
       message: 'Budget successfully created.',
       budget: budget
@@ -64,11 +68,8 @@ exports.create = function(req, res) {
 };
 
 exports.update = function(req, res) {
-  Budget.find({
-    where: {
-      id: req.params.budgetId
-    }
-  }).then(function(budget) {
+  // only owners can update a budget.
+  Budget.oneByOwner().then(function(budget) {
     budget.updateAttributes(req.body.data).then(function() {
       console.log('what are the arguments??', arguments);
     });
@@ -76,11 +77,7 @@ exports.update = function(req, res) {
 };
 
 exports.destroy = function(req, res) {
-  Budget.find({
-    where: {
-      id: req.params.budgetId
-    }
-  }).then(function(budget) {
+  Budget.oneForUser(getUserId(req), req.params.budgetId).then(function(budget) {
     if (!budget) {
       res.status(404).json({errors: [{ message: 'Budget not found.'}]});
     }

@@ -1,10 +1,9 @@
 var Transaction = require('../models').Transaction;
-exports.new = function(req, res) {
 
-};
+exports.new = function(req, res) {};
 
 exports.index = function(req, res) {
-  var userId = req.session.passport.user;
+  var userId = req.session.passport.user.id;
   var budgetId = req.params.budgetId;
 
   res.format({
@@ -28,7 +27,7 @@ exports.show = function(req, res) {
   Transaction.find({
     where: {
       BudgetId: req.params.budgetId,
-      UserId: req.session.passport.user,
+      UserId: req.session.passport.user.id,
       id: req.params.transactionId
     }
   }).then(function(t) {
@@ -41,7 +40,7 @@ exports.show = function(req, res) {
 };
 
 exports.create = function(req, res) {
-  Transaction.addToBudget(req.session.passport.user, req.body.data).then(function(t) {
+  Transaction.addToBudget(req.session.passport.user.id, req.body.data).then(function(t) {
     res.status(201).json({
       message: 'Transaction successfully created.',
       transaction: t
@@ -64,7 +63,7 @@ exports.update = function(req, res) {
 };
 
 exports.destroy = function(req, res) {
-  Transaction.addToBudget(req.session.passport.user, req.body.data).then(function(t) {
+  Transaction.addToBudget(req.session.passport.user.id, req.body.data).then(function(t) {
     res.status(201).json({
       message: 'Transaction successfully created.',
       transaction: t

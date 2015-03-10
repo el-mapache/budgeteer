@@ -15,12 +15,9 @@ var TextInput = React.createClass({
     }
   },
 
-  componentWillRecieveProps: function() {
-    console.log('input',arguments)
-  },
-
   render: function() {
-    this.state.value = this.props.value
+    this.state.value = this.props.value;
+
     return (
       <div onClick={this.focusInput} className="input-field col s8">
         <input onFocus={this.floatLabel}
@@ -36,6 +33,8 @@ var TextInput = React.createClass({
   },
 
   // this should be a component with a declarative animation.
+  // that way when a component loads with a value already assigned, it will
+  // properly float.
   floatLabel: function(evt) {
     if (this.props.value) {
       return;

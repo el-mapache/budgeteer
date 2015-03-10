@@ -28,7 +28,7 @@ var BudgetList = React.createClass({
             </thead>
             <tbody>
               {this.props.budgets.map(function(budget) {
-                return (<BudgetListItem budget={budget}/>);
+                return (<BudgetListItem key={budget.id} budget={budget}/>);
               })}
             </tbody>
           </table>

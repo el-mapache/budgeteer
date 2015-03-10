@@ -18,18 +18,38 @@ module.exports = Store.create({
     };
   },
 
+  // TODO not sure how to handle gets with the automatic state updates
+  getAll: function(budgetId) {
+    var transactions = this.getState().transactions;
+
+    if (transactions.length) {
+      // moving between unmounted components will make this difficult
+      return;
+    }
+
+    request.get('/budgets/' + budgetId + '/transactions')
+    .set('Accept', 'application/json')
+    .end(function(res) {
+      if (res.ok) {
+        this.setState({transactions: res.body.transactions});
+      }
+    }.bind(this));
+  },
+
   onCreate: function(data) {
     request.post('/budgets/' + data.BudgetId + '/transactions/create')
     .set('Accept', 'application/json')
     .send({ data: data })
-    .end((response) => {
+    .end(function(response) {
       if (response.body.errors) {
         //handle errors
       }
 
+      this.merge(response.body.transaction, {User: budgeteer.currentUser});
+
       this.merge(response.body, { transactions: this.mergeTransactions(response.body.transaction) });
       this.setState(this.merge(this.getState(), response.body));
-    });
+    }.bind(this));
   },
 
   // add any returned transactions to the existing cache of transactions

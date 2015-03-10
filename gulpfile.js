@@ -24,7 +24,7 @@ gulp.task('js', function () {
     })).on('prebundle', function(bundler) {
       bundler.require('react');
     })
-    .pipe(gulp.dest('./build/js'));
+    .pipe(gulp.dest('/Users/Taco/Documents/code/budgeteer-rails/app/assets/javascripts/bundle.js'));
 });
 
 gulp.task('css', function() {
@@ -98,7 +98,8 @@ function watchifyScript() {
   var rebundle = function() {
     watcher.bundle()
            .pipe(source('bundle.js'))
-           .pipe(gulp.dest('./build/js'));
+           .pipe(gulp.dest('/Users/Taco/Documents/code/budgeteer-rails/app/assets/javascripts'));
+           //.pipe(gulp.dest('./build/js'));
     console.log('js compiled');
   }
 

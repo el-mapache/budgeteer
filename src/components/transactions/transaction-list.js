@@ -2,27 +2,20 @@ var React = require('react');
 var TransactionListItem = require('./transaction-list-item.js');
 var TransactionStore = require('../../stores/transaction-store.js');
 var StoreConsumer = require('../../mixins/store-consumer.js');
-
+var Router = require('react-router');
 
 var TransactionList = React.createClass({
-  mixins: [StoreConsumer.fromStore(TransactionStore)],
+  mixins: [StoreConsumer.fromStore(TransactionStore), Router.State],
 
-  getTransactions: function() {
-    return this.state.transactions.length ? this.state.transactions : this.props.transactions;
-  },
-
-  getInitialState: function() {
-    return {
-      transactions: []
-    };
+  componentWillMount: function() {
+    TransactionStore.getAll(this.getParams().budgetId);
   },
 
   render: function() {
-    console.log('t', this.state.transactions)
     return (
-      <div>
-        <section className="row">
-          <table className="col s10 collection bordered hoverable responsive-table card-panel z-depth-1">
+      <section className="row">
+        <div className="col s12">
+          <table className="bordered hoverable responsive-table">
             <thead>
               <tr>
                 <td className="collection-item"><b>Title</b></td>
@@ -36,14 +29,14 @@ var TransactionList = React.createClass({
               </tr>
             </thead>
             <tbody>
-              {this.getTransactions().map(function(transaction) {
+              {this.state.transactions.map(function(transaction) {
                 return ( <TransactionListItem key={transaction.id} transaction={transaction} />);
               })}
             </tbody>
           </table>
-        </section>
-      </div>
-    )
+        </div>
+      </section>
+    );
   }
 });
 

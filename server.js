@@ -55,9 +55,12 @@ app.use(cookieParser());
 app.use(flash());
 
 
-
 var routes = require('./routes/index.js')(passport);
 
+app.use(function(req, res, next) {
+  res.locals.currentUser = JSON.stringify(req.session.passport.user);
+  next();
+});
 
 app.use('/', routes);
 
