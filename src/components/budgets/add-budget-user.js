@@ -21,8 +21,7 @@ var AddBudgetUserForm = React.createClass({
     return(
       <div className="row">
         <div className="col s6">
-          <h5>Add another user to this budget</h5>
-          <p><small>if the user's email is in our system, we'll add them to your budget</small></p>
+          <h5>Add someone to this budget</h5>
           <TextInput labelText="User's email" autoComplete="off" name="email" value={this.state.email} type="email" onChange={this.handleInputUpdate}/>
           <Button onClick={this.onAddUser} text="Add user"/>
         </div>
@@ -32,7 +31,7 @@ var AddBudgetUserForm = React.createClass({
 
   onAddUser: function() {
     var payload = {
-      budgetId: this.props.budgetId,
+      budget_id: this.props.budgetId,
       email: this.state.email
     };
 

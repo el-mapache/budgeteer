@@ -12,32 +12,24 @@ var ViewBudget = React.createClass({
 
   getInitialState: function() {
     return {
-      budget: budgetStore.getCurrent(this.getParams().budgetId)
+      budget: BudgetStore.getBudget(this.getParams().budgetId)
     };
-  },
-
-  componentWillMount: function() {
-    // If there are no budgets already in the props, fetch one from the server
-    if (!this.props.budgets.length) {
-      BudgetActions.get({
-        budgetId: this.state.budgetId
-      });
-    }
   },
 
   render: function() {
     var budget = this.state.budget;
-    var transactionsByUser = this.amountsByUser(budget.Transactions);
+    //var transactionsByUser = this.amountsByUser(budget.Transactions);
 
-    var nodes = [];
+    //var nodes = [];
 
-    for (var user in transactionsByUser) {
-      var currentUser = transactionsByUser[user];
-      nodes.push(<span>{user} has spent {parseFloat(currentUser.hasSpent).toFixed(2)} and is owed {parseFloat(currentUser.isOwed).toFixed(2)}</span>);
-    }
+    // for (var user in transactionsByUser) {
+    //   var currentUser = transactionsByUser[user];
+    //   nodes.push(<span>{user} has spent {parseFloat(currentUser.hasSpent).toFixed(2)} and is owed {parseFloat(currentUser.isOwed).toFixed(2)}</span>);
+    // }
+//<TransactionList />\
 
-    var users = budget.Users.map(function(user) {
-      return user.firstName;
+    var users = budget.users.map(function(user) {
+      return <p>{user.first_name}</p>;
     });
 
     return (
@@ -46,53 +38,53 @@ var ViewBudget = React.createClass({
         <h1>{budget.title}</h1>
         <div className="row">
           <div className="col s12">
-            <p className="col s3 center-align">{users}</p>
+            <p className="col s3 center-align">{ users }</p>
             <p className="col s3 center-align">Budget Total: ${budget.total}</p>
-            <p className="col s3 center-align">So far, you have spent ${this.totalSpent(budget.Transactions)} of your budget.</p>
+            <p className="col s3 center-align">So far, you have spent $total_spent of your budget.</p>
             <p className="col s3 center-align">
-              {nodes}
+              nodes
             </p>
           </div>
         </div>
         <AddBudgetUserForm budgetId={this.getParams().budgetId} />
-        <TransactionList />
+        
         <NewTransaction />
       </div>
     );
-  },
-
-  totalSpent: function(transactions) {
-    transactions = transactions || [];
-    return parseFloat(transactions.reduce(function(memo, item) {
-      return memo += parseInt(item.amount, 10);
-    }, 0)).toFixed(2);
-  },
-
-  amountsByUser: function(transactions) {
-    if (!transactions) {
-      return;
-    }
-
-    return transactions.reduce(function(memo, t) {
-      var user = t.User.firstName;
-      if (!memo[user]) {
-        memo[user] = {
-          transactions: [],
-          hasSpent: 0,
-          isOwed: 0
-        };
-      }
-
-      var amount = parseFloat(t.amount);
-      var percent = t.percentageToSplit / 100;
-
-      memo[user].hasSpent += amount;
-      memo[user].isOwed += (amount * percent);
-      memo[user].transactions.push(t);
-
-      return memo;
-    },{});
   }
+
+  // totalSpent: function(transactions) {
+  //   transactions = transactions || [];
+  //   return parseFloat(transactions.reduce(function(memo, item) {
+  //     return memo += parseInt(item.amount, 10);
+  //   }, 0)).toFixed(2);
+  // },
+
+  // amountsByUser: function(transactions) {
+  //   if (!transactions) {
+  //     return;
+  //   }
+
+  //   return transactions.reduce(function(memo, t) {
+  //     var user = t.User.firstName;
+  //     if (!memo[user]) {
+  //       memo[user] = {
+  //         transactions: [],
+  //         hasSpent: 0,
+  //         isOwed: 0
+  //       };
+  //     }
+
+  //     var amount = parseFloat(t.amount);
+  //     var percent = t.percentageToSplit / 100;
+
+  //     memo[user].hasSpent += amount;
+  //     memo[user].isOwed += (amount * percent);
+  //     memo[user].transactions.push(t);
+
+  //     return memo;
+  //   },{});
+  // }
 });
 
 module.exports = ViewBudget;

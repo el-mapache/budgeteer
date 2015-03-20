@@ -2,13 +2,11 @@ var React = require('react');
 var AddBudgetButton = require('./add-budget-button.js');
 var BudgetActions = require('../../actions/budget-actions.js');
 var BudgetListItem = require('./budget-list-item.js');
+var _  = require('underscore');
+
+var UserStore = require('../../stores/user-store.js');
 
 var BudgetList = React.createClass({
-  componentWillMount: function() {
-    // TODO move this to fetching/rendering on the server, eventually
-    BudgetActions.getAll();
-  },
-
   render: function() {
     return (
       <div>
@@ -27,14 +25,22 @@ var BudgetList = React.createClass({
               </tr>
             </thead>
             <tbody>
-              {this.props.budgets.map(function(budget) {
-                return (<BudgetListItem key={budget.id} budget={budget}/>);
-              })}
+              { this.budgetListItems() }
             </tbody>
           </table>
         </section>
       </div>
     )
+  },
+
+  budgetListItems: function() {
+    return _.map(this.props.budgets, function(budget) {
+      return (<BudgetListItem key={budget.id} owner={this.getOwnerFor(budget)} budget={budget}/>);
+    }.bind(this));
+  },
+
+  getOwnerFor: function(budget) {
+    return UserStore.get(budget.user_id);
   }
 });
 

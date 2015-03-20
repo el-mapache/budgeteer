@@ -8,47 +8,48 @@ exports.Budget = {
     start_date: '',
     end_date: '',
     created_at: '',
+    user_id: '',
     users: [],
     transactions: []
   },
 
   build: function(attrs) {
     attrs = attrs || {};
-    return assign(this.defaults, attrs);
+    return assign({}, this.defaults, attrs);
   }
 };
 
-exports.Transaction = function() {
-  this.defaults = {
+exports.Transaction = {
+  defaults: {
     id: '',
     category: '',
-    purchasedOn: '',
+    purchased_on: '',
     amount: '',
-    percentageToSplit: '',
+    percentage_to_split: '',
     title: '',
     description: '',
-    createdAt: '',
-    BudgetId: '',
-    UserId: ''
-  };
+    created_at: '',
+    budget_id: '',
+    user_id: ''
+  },
 
-  this.build = function(attrs) {
+  build: function(attrs) {
     attrs = attrs || {};
-    return assign(this.defaults, attrs);
-  };
+    return assign({}, this.defaults, attrs);
+  }
 };
 
-exports.User = function() {
-  this.defaults =  {
+exports.User = {
+  defaults:  {
     id: '',
-    firstName: '',
-    lastName: '',
+    first_name: '',
+    last_name: '',
     email: '',
     photo: ''
-  };
+  },
 
-  this.build = function(attrs) {
+  build: function(attrs) {
     attrs = attrs || {};
-    return assign(this.defaults, attrs);
-  };
+    return assign({}, this.defaults, attrs);
+  }
 };

@@ -2,13 +2,10 @@ var EventEmitter = require('events').EventEmitter;
 var AppDispatcher = require('../dispatcher/app-dispatcher.js');
 var assign = require('object-assign');
 
-
 var CHANGE_EVENT = 'change';
-
 
 var StoreFactory = function() {
   var _STATE = {};
-  var _hasBeenInitialized = !!_hasBeenInitialized;
 
   // Take a raw action, uppercase it, and stick an 'on' in front of it.
   // For example, 'destroy' becomes 'onDestroy'.
@@ -36,7 +33,8 @@ var StoreFactory = function() {
       var actionClass = actionAndHandler[0],
           handler = actionAndHandler[1];
 
-      // This store hasn't been bound to the action class.
+      // This store hasn't been bound to the action class whose event is being dispatched.
+      // We know there are no callbacks to execute so we return.
       // TODO test
       if (!(actionClass in this.CALLBACKS)) {
         return;
@@ -48,10 +46,11 @@ var StoreFactory = function() {
       if (callback) {
         this[callback](payload.data);
       }
+
+      return true;
     }.bind(this));
 
     this.setState(this.getInitialState());
-
     this.init();
   }
 
@@ -61,24 +60,6 @@ var StoreFactory = function() {
   Store.prototype.getInitialState = function() {
     return {};
   };
-
-  Store.prototype.setInitialState = function() {
-    if (this.isInitialized()) {
-      return;
-    }
-
-    this.setInitialized();
-    this.setState(assign(this.getState(), this.getInitialState()));
-  };
-
-  Store.prototype.setInitialized = function() {
-    _hasBeenInitialized = true;
-  };
-
-  Store.prototype.isInitialized = function() {
-    return _hasBeenInitialized;
-  };
-
 
   Store.prototype.getState = function() {
     return _STATE;
@@ -97,11 +78,11 @@ var StoreFactory = function() {
     * @param {map} object A dictionary of bindings from actions to action names.
     *   Allows for creation of manual bindings to actions rather than automatically deriving
     *   them based on the name of the action.
-    * @param {skipAutoBind} boolean Create automatic bindings to store actions.
+    * @param {skipAutoBind} boolean skip creation of automatic bindings to store actions.
     *
     * For example:
     *
-    * myStore.bindToActions(Users, {
+    * myStore.bindToActions(UserActions, {
     *   'afterCreate': 'mergeUsers'
     * });
     *
@@ -118,7 +99,7 @@ var StoreFactory = function() {
     if (typeof map === 'object') {
       for (var action in map) {
         var handler = map[action];
-        callbacks[action] = isFunction(handler) ? handler : function(){};
+        callbacks[action] = isFunction(this[handler]) ? handler : function(){};
       }
     }
 
@@ -168,12 +149,6 @@ var StoreFactory = function() {
     }
 
     this.on(CHANGE_EVENT, callback.bind(ctx, this.getState()));
-
-    // If the store hasn't been initialized, set its initial state
-    // and toggle the initialized flag.
-    if (!this.isInitialized()) {
-      this.setInitialState();
-    }
 
     isFunction(onAfterBind) && onAfterBind(this.getState());
   };

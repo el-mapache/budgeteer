@@ -1,40 +1,51 @@
 var Store = require('./store.js')();
-var BudgetUsersStore = require('./budget-users-store.js');
+var UserActions = require('../actions/user-actions.js');
 var BudgetActions = require('../actions/budget-actions.js');
 var request = require('superagent');
 var models = require('../models/models.js');
 var csrf = require('../mixins/csrf-util.js');
-var _ = require('underscore');
 
 var currentBudgetId = null;
 
-module.exports =  Store.create({
-  init: function() {
-    this.bindToActions(BudgetActions);
-    BudgetUsersStore.listenTo(this.mergeUsers, this);
-  },
-
+var BudgetStore =  Store.create({
   getInitialState: function() {
     return {
-      budgets: [],
-      errors: [],
-      currentBudget: null,
-      editing: false,
-      creating: true,
-      message: ''
+      budgets: {}
     };
   },
 
-  currentBudget: function(id) {
-    return _.findWhere(this.budgets, {id: id}) || models.Budget.build();
+  init: function() {
+    this.bindToActions(BudgetActions);
+    this.bindToActions(UserActions, {
+      'getSuccess': '_mergeUsers'
+    }, true);
+  },
+
+  getBudget: function(id) {
+    var budget = this.budgets()[id];
+
+    if (budget) {
+      currentBudgetId = id;
+      return budget;
+    }
+
+    return models.Budget.build();
   },
 
   budgets: function() {
     return this.getState().budgets;
   },
 
-  mergeUsers: function(data) {
-    console.log(data);
+  _mergeUsers: function(user) {
+    var currentBudget = this.getBudget(currentBudgetId);
+
+    if (~Object.keys(currentBudget.users).indexOf(user.id)) {
+      return;
+    }
+
+    currentBudget.users.push(user);
+
+    this.setState(this.getState());
   },
 
   onCreate: function(data) {
@@ -43,30 +54,25 @@ module.exports =  Store.create({
     .set('X-CSRF-Token', csrf.getToken())
     .send({ budget: data })
     .end(function(response) {
-      if (!response.error) {
-        var stateDelta = this.merge(response.body, {creating: false});
-        this.setState(this.merge(this.getState(), stateDelta));
+      if (response.error) {
+        console.log('Error creating budget.');
+        return;
       }
 
-      this.setState(this.merge(this.getState(), response.body));
-      console.log(this.getState());
+      return this.setState(this.merge(this.getState(), response.body));
     }.bind(this));
   },
 
-  onGetAll: function() {
+  getAll: function(done) {
+    var cache = this.budgets();
+
+    if (cache.length) {
+      return cache;
+    }
+
     request.get('/budgets')
     .set('Accept', 'application/json')
-    .end(function(response) {
-      var rawBudgets = response.body.budgets;
-
-      var budgets = {
-        budgets: rawBudgets.map(function(b) { return models.Budget.build(b); })
-      };
-
-      console.log(budgets);
-
-      this.setState(this.merge(this.getState(), response.body));
-    }.bind(this));
+    .end(this._handleGetAll.bind(this, done));
   },
 
   onGet: function(data) {
@@ -82,5 +88,31 @@ module.exports =  Store.create({
 
   onUpdate: function(data) {},
 
-  onDestroy: function(data) {}
+  onDestroy: function(data) {},
+
+  _handleGetAll: function(done, response) {
+    if (response.error) {
+      console.log('Error fetching budgets.');
+      return;
+    }
+
+    var budgets = response.body.budgets;
+
+    // get the budgets currently cached by the store.
+    var existingBudgets = this.budgets();
+
+    // create a new data structure of budget models keyed to their ids.
+    var newBudgets = budgets.reduce(function(memo, budget) {
+      memo[budget.id] = models.Budget.build(budget);
+      return memo;
+    }, {});
+
+    this.setState({
+      budgets: this.merge(existingBudgets, newBudgets)
+    });
+
+    done();
+  }
 });
+
+module.exports = BudgetStore;

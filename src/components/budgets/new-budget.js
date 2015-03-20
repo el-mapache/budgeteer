@@ -20,7 +20,6 @@ var NewBudget = React.createClass({
   },
 
   render: function() {
-    console.log(this.state)
     return (
       <div>
         <Link to="budgets">Back to Budgets</Link>
@@ -29,8 +28,8 @@ var NewBudget = React.createClass({
             <div className="row">
               <TextInput labelText="Budget Title" name="title" value={this.state.title} onChange={this.handleInputUpdate} />
               <TextInput labelText="How much do you want to spend?" onChange={this.handleInputUpdate} name="total" value={this.state.total} />
-              <BudgetDatePicker labelText="Budget Start" ref="startDate" className="col s6" onDayClick={this.setDay.bind(this, 'startDate')} value={this.state.startDate} />
-              <BudgetDatePicker labelText="Budget End" ref="endDate" className="col s6" onDayClick={this.setDay.bind(this, "endDate")} value={this.state.endDate} />
+              <BudgetDatePicker labelText="Budget Start" ref="startDate" className="col s6" onDayClick={this.setDay.bind(this, 'start_date')} value={this.state.start_date} />
+              <BudgetDatePicker labelText="Budget End" ref="endDate" className="col s6" onDayClick={this.setDay.bind(this, "end_date")} value={this.state.end_date} />
             </div>
             <Button buttonType="submit" text="Create Budget"/>
           </div>

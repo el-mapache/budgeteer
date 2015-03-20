@@ -13,6 +13,8 @@ var BudgetList = require('./budgets/budget-list.js');
 var NewTransaction = require('./transactions/new-transaction.js');
 var ViewBudget = require('./budgets/view-budget.js');
 
+var BudgetUsersStore = require('../stores/budget-users-store.js');
+
 var Budgeteer = React.createClass({
 	render: function() {
 		return (
@@ -40,6 +42,6 @@ var routes = (
   </Route>
 );
 
-Router.run(routes, Router.HistoryLocation, function(Handler) {
+Router.run(routes, Router.HistoryLocation, function(Handler, state) {
   React.render(<Handler/>, document.getElementById('budgeteer'));
 });
