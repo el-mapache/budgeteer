@@ -26,7 +26,7 @@ var ViewBudget = React.createClass({
     //   var currentUser = transactionsByUser[user];
     //   nodes.push(<span>{user} has spent {parseFloat(currentUser.hasSpent).toFixed(2)} and is owed {parseFloat(currentUser.isOwed).toFixed(2)}</span>);
     // }
-//<TransactionList />\
+
 
     var users = budget.users.map(function(user) {
       return <p>{user.first_name}</p>;
@@ -47,7 +47,7 @@ var ViewBudget = React.createClass({
           </div>
         </div>
         <AddBudgetUserForm budgetId={this.getParams().budgetId} />
-        
+        <TransactionList budgetId={this.getParams().budgetId} />
         <NewTransaction />
       </div>
     );

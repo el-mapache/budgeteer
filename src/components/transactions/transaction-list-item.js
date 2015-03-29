@@ -11,10 +11,10 @@ var TransactionListItem = React.createClass({
     return (
       <tr>
         <td className="collection-item">{transaction.title}</td>
-        <td className="collection-item">{this.humanize(transaction.purchasedOn)}</td>
+        <td className="collection-item">{this.humanize(transaction.purchased_on)}</td>
         <td className="collection-item">{this._getUserNameFrom(transaction)}</td>
         <td className="collection-item">{transaction.amount}</td>
-        <td className="collection-item">{transaction.percentageToSplit}</td>
+        <td className="collection-item">{transaction.percentage_to_split}</td>
         <td className="collection-item">{transaction.category}</td>
         <td className="collection-item">{transaction.note}</td>
         <td className="collection-item">{this.humanize(transaction.createdAt)}</td>
@@ -23,8 +23,7 @@ var TransactionListItem = React.createClass({
   },
 
   _getUserNameFrom: function(transaction) {
-    return (transaction.User && transaction.User.firstName) ||
-           UserStore.getById(transaction.UserId).firstName;
+    return UserStore.get(transaction.user_id).first_name;
   }
 });
 

@@ -59,7 +59,14 @@ var BudgetStore =  Store.create({
         return;
       }
 
-      return this.setState(this.merge(this.getState(), response.body));
+      var budget = response.body.budget;
+
+      var delta = {};
+      delta[budget.id] = budget;
+
+      return this.setState({
+        budgets: this.merge(this.budgets(), delta)
+      });
     }.bind(this));
   },
 

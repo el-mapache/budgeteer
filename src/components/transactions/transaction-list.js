@@ -7,8 +7,16 @@ var Router = require('react-router');
 var TransactionList = React.createClass({
   mixins: [StoreConsumer.fromStore(TransactionStore), Router.State],
 
+  propTypes: {
+    budgetId: React.PropTypes.string.isRequired
+  },
+
+  getInitialState: function() {
+    return TransactionStore.getState();
+  },
+
   componentWillMount: function() {
-    TransactionStore.getAll(this.getParams().budgetId);
+    TransactionStore.getAll(this.props.budgetId);
   },
 
   render: function() {

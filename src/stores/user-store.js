@@ -18,34 +18,8 @@ var UserStore = Store.create({
   init: function() {
     BudgetStore.listenTo(this._mergeUsers, this);
     this.bindToActions(BudgetUsersActions, {
-      'createSuccess': 'getOne'
+      'createSuccess': '_getBudgetUser'
     }, true);
-  },
-
-  getOne: function(data) {
-    var id = data.budgetUser.user_id;
-    var cachedUser = this.users()[id];
-
-    if (cachedUser) {
-      return setTimeout(function() {
-        UserActions.getSuccess(cachedUser);
-      }.bind(this),0);
-    }
-
-    request.get('/users/' + id )
-    .set('Accept', 'application/json')
-    .end(function afterGetUser(response) {
-      if (response.error) {
-        console.log('Error fetching user.');
-      } else {
-        var delta = {};
-        delta[id] = response.body.user
-        this.setState(this.merge(this.users(), delta));
-
-        return UserActions.getSuccess(delta);
-      }
-    }.bind(this));
-
   },
 
   get: function(userId) {
@@ -85,7 +59,32 @@ var UserStore = Store.create({
     }
 
     this.setState({users: this.merge(existingUsers, usersToAdd)});
-  }
+  },
+
+  _getBudgetUser: function(data) {
+    var id = data.budgetUser.user_id;
+    var cachedUser = this.users()[id];
+
+    if (cachedUser) {
+      return setTimeout(function() {
+        UserActions.getSuccess(cachedUser);
+      }.bind(this),0);
+    }
+
+    request.get('/users/' + id )
+    .set('Accept', 'application/json')
+    .end(function afterGetUser(response) {
+      if (response.error) {
+        console.log('Error fetching user.');
+      } else {
+        var delta = {};
+        delta[id] = response.body.user
+        this.setState(this.merge(this.users(), delta));
+
+        return UserActions.getSuccess(delta);
+      }
+    }.bind(this));
+  },
 });
 
 module.exports = UserStore;
